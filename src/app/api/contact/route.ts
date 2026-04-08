@@ -19,9 +19,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 });
     }
 
-    // Enviamos el correo a través de Resend
+    // 1. Notificación para Marcelo (Dueño)
     await resend.emails.send({
-      from: 'Acme <onboarding@resend.dev>', // Por defecto en modo trial, luego puedes usar tu dominio
+      from: 'Portafolio <onboarding@resend.dev>',
       to: 'marcelo.rcanessa@gmail.com',
       subject: `Coordinar reunión inicial - ${name}`,
       replyTo: email,
@@ -33,8 +33,25 @@ export async function POST(request: Request) {
           <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
           <p><strong>Mensaje:</strong></p>
           <p style="white-space: pre-wrap;">${message}</p>
-          <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;" />
-          <p style="font-size: 0.8rem; color: #666;">Este mensaje fue enviado desde el formulario de contacto de tu portafolio.</p>
+        </div>
+      `
+    });
+
+    // 2. Respuesta automática para el Cliente (Backup)
+    await resend.emails.send({
+      from: 'Marcelo Rodriguez Canessa <onboarding@resend.dev>',
+      to: email,
+      subject: 'Propuesta recibida',
+      html: `
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px; color: #333;">
+          <h2 style="color: #3b82f6;">¡Gracias por contactarme!</h2>
+          <p>Estimado/a <strong>${name}</strong>,</p>
+          <p>Su propuesta ha sido recibida correctamente. He tomado nota de sus requerimientos y nos contactaremos con usted a la brevedad para coordinar los siguientes pasos.</p>
+          <p>Este es un mensaje de respaldo para confirmar que la información ha sido procesada de manera exitosa en nuestro sistema.</p>
+          <br />
+          <p>Atentamente,</p>
+          <p><strong>Marcelo Rodriguez Canessa</strong><br />
+          Consultoría e Ingeniería Tecnológica</p>
         </div>
       `
     });
