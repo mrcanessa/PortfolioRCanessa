@@ -86,6 +86,16 @@ export default function InteractiveProjectView({ project }: { project: Project }
         initial={{ x: '100%' }}
         animate={{ x: isVisible ? '0%' : '100%' }}
         transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={0.15}
+        onDragEnd={(e, { offset, velocity }) => {
+          // Si el usuario desliza con el pulgar hacia la derecha (más de 80px o rápido)
+          if (offset.x > 80 || velocity.x > 300) {
+            setSidebarOpen(false);
+            setHoverAreaActive(false);
+          }
+        }}
         style={{
           position: 'fixed',
           top: 0,
