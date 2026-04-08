@@ -35,6 +35,11 @@ export async function getDb(): Promise<Database> {
         name TEXT NOT NULL,
         email TEXT NOT NULL,
         message TEXT NOT NULL,
+        industry TEXT,
+        scale TEXT,
+        timeline TEXT,
+        procedures TEXT,
+        notes TEXT,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
 
@@ -46,6 +51,16 @@ export async function getDb(): Promise<Database> {
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    // Migraciones seguras para añadir columnas si la tabla ya existía
+    const columns = ['industry', 'scale', 'timeline', 'procedures', 'notes'];
+    for (const col of columns) {
+      try {
+        await dbInstance!.exec(`ALTER TABLE inquiries ADD COLUMN ${col} TEXT`);
+      } catch (e) {
+        // La columna probablemente ya existe, ignoramos el error
+      }
+    }
   }
   return dbInstance!;
 }

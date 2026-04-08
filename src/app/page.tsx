@@ -15,7 +15,16 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default function Home() {
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    industry: '',
+    scale: '',
+    timeline: '',
+    procedures: '',
+    message: '',
+    notes: ''
+  });
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,7 +38,10 @@ export default function Home() {
       });
       if (!res.ok) throw new Error();
       setStatus('success');
-      setFormData({ name: '', email: '', message: '' });
+      setFormData({ 
+        name: '', email: '', industry: '', scale: '', 
+        timeline: '', procedures: '', message: '', notes: '' 
+      });
       setTimeout(() => setStatus('idle'), 3000);
     } catch {
       setStatus('error');
@@ -40,9 +52,10 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
+      {/* ... (sección hero sin cambios) */}
       <section style={{ minHeight: '90vh', display: 'flex', alignItems: 'center', position: 'relative', padding: '6rem 0' }}>
         <div style={{ position: 'absolute', top: '10%', left: '5%', width: '40%', height: '40%', background: 'radial-gradient(circle, rgba(59,130,246,0.08) 0%, transparent 70%)', zIndex: -1 }}></div>
-        <div className="container">
+        <div className="container" id="inicio">
           <ParallaxSection offset={80}>
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
@@ -185,18 +198,60 @@ export default function Home() {
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>EMPRESA</label>
-                <input required type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Ej. Acme Inc." />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>EMPRESA / NOMBRE</label>
+                <input required type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Ej. Corporación Acme" />
               </div>
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>CORREO CORPORATIVO</label>
                 <input required type="email" className="input-field" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="nombre@empresa.com" />
               </div>
             </div>
-            
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>TIPO DE CLIENTE</label>
+                <select required className="input-field" value={formData.industry} onChange={e => setFormData({...formData, industry: e.target.value})}>
+                  <option value="">Seleccione industria...</option>
+                  <option value="Supermercado / Retail">Supermercado / Retail</option>
+                  <option value="Botillería / Distribución">Botillería / Distribución</option>
+                  <option value="Corporativo / Servicios">Corporativo / Servicios</option>
+                  <option value="Logística / Transporte">Logística / Transporte</option>
+                  <option value="Otro">Otro sector</option>
+                </select>
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>ESCALA (EQUIPOS/USUARIOS)</label>
+                <input required type="text" className="input-field" value={formData.scale} onChange={e => setFormData({...formData, scale: e.target.value})} placeholder="Ej. 15 puestos, 2 sedes" />
+              </div>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>PLAZO ESTIMADO DE REALIZACIÓN</label>
+                <select required className="input-field" value={formData.timeline} onChange={e => setFormData({...formData, timeline: e.target.value})}>
+                  <option value="">¿Cuándo desea iniciar?</option>
+                  <option value="Urgente (Lo antes posible)">Urgente (Lo antes posible)</option>
+                  <option value="Corto Plazo (1 mes)">Corto Plazo (1 mes)</option>
+                  <option value="Mediano Plazo (3-6 meses)">Mediano Plazo (3-6 meses)</option>
+                  <option value="Solo Cotización">Solo Cotización / Planeación</option>
+                </select>
+              </div>
+            </div>
+
             <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>MENSAJE / REQUERIMIENTO</label>
-              <textarea required className="input-field" rows={5} value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} placeholder="Describa brevemente el reto técnico..." />
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>MENSAJE / REQUERIMIENTO PRINCIPAL</label>
+              <textarea required className="input-field" rows={4} value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} placeholder="Describa brevemente el reto técnico..." />
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>PROCEDIMIENTOS A USAR</label>
+                <textarea className="input-field" rows={3} value={formData.procedures} onChange={e => setFormData({...formData, procedures: e.target.value})} placeholder="Ej. VPN, Migración, Cifrado..." />
+              </div>
+              <div>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent)' }}>NOTAS ADICIONALES</label>
+                <textarea className="input-field" rows={3} value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} placeholder="Cualquier otro detalle para desplayarse..." />
+              </div>
             </div>
             
             <button 
@@ -205,7 +260,7 @@ export default function Home() {
               disabled={status === 'loading'}
               style={{ marginTop: '1rem', padding: '1.2rem', fontWeight: 700 }}
             >
-              {status === 'loading' ? 'Procesando...' : 'Enviar Propuesta'}
+              {status === 'loading' ? 'Procesando...' : 'Enviar Propuesta Estratégica'}
             </button>
             {status === 'success' && <p style={{ color: '#4ade80', textAlign: 'center', marginTop: '1rem', fontWeight: 600 }}>¡Mensaje enviado con éxito!</p>}
             {status === 'error' && <p style={{ color: '#f87171', textAlign: 'center', marginTop: '1rem', fontWeight: 600 }}>Error al enviar. Intente con Gmail PASS.</p>}
