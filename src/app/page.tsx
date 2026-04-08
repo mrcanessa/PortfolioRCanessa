@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section style={{ minHeight: '85vh', display: 'flex', alignItems: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section style={{ minHeight: '85vh', display: 'flex', alignItems: 'center', position: 'relative', overflowX: 'hidden' }}>
         <div className="container">
           <ParallaxSection offset={80}>
             <motion.div
