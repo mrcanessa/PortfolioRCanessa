@@ -15,21 +15,19 @@ const NOTES: Record<string, number> = {
 
 // --- Engines Data ---
 
-// 1. Resident Evil
+// 1. Slow Thinking (Resident Evil Style)
 const RE_CHORDS = [
   ['A2', 'E3', 'A3', 'C4', 'E4'], ['D3', 'A3', 'D4', 'F4'],
   ['E3', 'G3', 'E4', 'G4'], ['A2', 'C3', 'E3', 'A3', 'C4']
 ];
-const RE_MELODY = [['E5', 'C5', 'A4', 'G4'], ['F4', 'E4', 'D4', 'C4']];
 
-// 2. Doom
+// 2. Rock (Doom Style)
 const DOOM_BASS = ['E1', 'E1', 'F1', 'E1', 'G1', 'E1', 'F1', 'E1'];
 
-// 3. Classic (Metallica)
+// 3. Metal (Metallica Style)
 const CLASSIC_RIFF = ['E2', 'E2', 'E2', 'G2', 'A2', 'E2', 'E2', 'E2', 'D2', 'C2'];
 
-// 4. Jamiroquai (Deeper Underground - Godzilla)
-// Key: C# Minor | Riff focusing on C#2, E2, F#2, B1
+// 4. Deep Core (Jamiroquai Style)
 const JAMIROQUAI_RIFF = ['C#2', 'C#2', 'C#2', 'E2', 'C#2', 'C#2', 'B1', 'C#2'];
 
 // --- Utility: Distortion Curve ---
@@ -110,7 +108,6 @@ export default function AmbientMusic() {
     osc.type = type;
     osc.frequency.setValueAtTime(freq, ctx.currentTime);
     
-    // Acid sweep for jamiroquai/doom
     if (useDist) {
         filter.type = 'lowpass';
         filter.frequency.setValueAtTime(freq * 4, ctx.currentTime);
@@ -163,20 +160,13 @@ export default function AmbientMusic() {
   }, [playNote]);
 
   const startJamiroquai = useCallback(() => {
-    // 104 BPM (~577ms per beat)
     const beat = 577;
     intervalsRef.current.push(setInterval(() => {
-      const note = JAMIROQUAI_RIFF[engineStateRef.current.index % JAMIROQUAI_RIFF.length];
-      const freq = NOTES[note] || 69.3;
-
-      // Heavy funky bass
+      const freq = NOTES[JAMIROQUAI_RIFF[engineStateRef.current.index % JAMIROQUAI_RIFF.length]] || 69.3;
       playNote(freq, 0.25, 0.6, 'sawtooth', 0.01, 0.1, true);
-      
-      // Funky percussive elements periodically
       if (engineStateRef.current.index % 4 === 2) {
-        playNote(40, 0.05, 0.3, 'square', 0.01, 0.02, true); // Kick
+        playNote(40, 0.05, 0.3, 'square', 0.01, 0.02, true);
       }
-      
       engineStateRef.current.index++;
     }, beat / 2));
   }, [playNote]);
@@ -218,10 +208,10 @@ export default function AmbientMusic() {
               initial={{ opacity: 0, y: 10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.9 }}
               style={{ background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(16px)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '16px', padding: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', boxShadow: '0 10px 40px rgba(0,0,0,0.6)', marginBottom: '0.5rem' }}
             >
-              <MenuButton active={activeEngine==='resident-evil'&&isPlaying} onClick={()=>{startMusic('resident-evil');setMenuOpen(false);}} icon="🧟" label="Resident Evil" />
-              <MenuButton active={activeEngine==='doom'&&isPlaying} onClick={()=>{startMusic('doom');setMenuOpen(false);}} icon="🔥" label="Doom Eternal" />
-              <MenuButton active={activeEngine==='classic'&&isPlaying} onClick={()=>{startMusic('classic');setMenuOpen(false);}} icon="🤘" label="Metallica Style" />
-              <MenuButton active={activeEngine==='jamiroquai'&&isPlaying} onClick={()=>{startMusic('jamiroquai');setMenuOpen(false);}} icon="🕶️" label="Jamiroquai (Godzilla)" />
+              <MenuButton active={activeEngine==='resident-evil'&&isPlaying} onClick={()=>{startMusic('resident-evil');setMenuOpen(false);}} icon="🧟" label="Slow Thinking" />
+              <MenuButton active={activeEngine==='doom'&&isPlaying} onClick={()=>{startMusic('doom');setMenuOpen(false);}} icon="🔥" label="Rock" />
+              <MenuButton active={activeEngine==='classic'&&isPlaying} onClick={()=>{startMusic('classic');setMenuOpen(false);}} icon="🤘" label="Metal" />
+              <MenuButton active={activeEngine==='jamiroquai'&&isPlaying} onClick={()=>{startMusic('jamiroquai');setMenuOpen(false);}} icon="🕶️" label="Deep Core" />
               <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '0.2rem 0' }} />
               <MenuButton active={false} onClick={()=>{stopMusic();setMenuOpen(false);}} icon="🚫" label="Apagar Música" red />
             </motion.div>
