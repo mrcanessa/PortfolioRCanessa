@@ -4,14 +4,13 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Types & Constants ---
-type EngineType = 'resident-evil' | 'doom' | 'classic' | 'magnetic';
+type EngineType = 'resident-evil' | 'doom' | 'classic' | 'jamiroquai';
 
 const NOTES: Record<string, number> = {
-  'E1': 41.20, 'F1': 43.65, 'G1': 49.00, 'A1': 55.00, 'D2': 73.42, 'G2': 98.00, 'B2': 123.47, 'E2': 164.81,
-  'Bb2': 116.54, 'Db3': 138.59, 'Eb3': 155.56, 'Gb3': 185.00, 'Ab3': 207.65, 
-  'A2': 110.00, 'C3': 130.81, 'D3': 146.83, 'E3': 164.81, 'F3': 174.61,
-  'G3': 196.00, 'A3': 220.00, 'Bb3': 233.08, 'C4': 261.63, 'Db4': 277.18, 'D4': 293.66, 'Eb4': 311.13, 'E4': 329.63,
-  'F4': 349.23, 'Gb4': 369.99, 'G4': 392.00, 'Ab4': 415.30, 'A4': 440.00, 'Bb4': 466.16, 'C5': 523.25, 'Db5': 554.37, 'Eb5': 622.25, 'E5': 659.25, 'F5': 698.46,
+  'E1': 41.20, 'F1': 43.65, 'G1': 49.00, 'A1': 55.00, 'B1': 61.74, 
+  'C2': 65.41, 'C#2': 69.30, 'D2': 73.42, 'Eb2': 77.78, 'E2': 82.41, 'F2': 87.31, 'G2': 98.00, 'A2': 110.00, 'B2': 123.47,
+  'C3': 130.81, 'C#3': 138.59, 'D3': 146.83, 'Eb3': 155.56, 'E3': 164.81, 'F3': 174.61, 'G3': 196.00, 'A3': 220.00, 'B3': 246.94,
+  'C4': 261.63, 'C#4': 277.18, 'D4': 293.66, 'E4': 329.63, 'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'C5': 523.25, 'E5': 659.25,
 };
 
 // --- Engines Data ---
@@ -29,16 +28,9 @@ const DOOM_BASS = ['E1', 'E1', 'F1', 'E1', 'G1', 'E1', 'F1', 'E1'];
 // 3. Classic (Metallica)
 const CLASSIC_RIFF = ['E2', 'E2', 'E2', 'G2', 'A2', 'E2', 'E2', 'E2', 'D2', 'C2'];
 
-// 4. Magnetic (ILLIT) - Bubbly hook & chords
-// Chords: Bb m7 - Ab m7 - Gb maj7 - F7
-const MAGNETIC_CHORDS = [
-  ['Bb2', 'Db3', 'F3', 'Ab3'],
-  ['Ab2', 'C3', 'Eb3', 'Gb3'],
-  ['Gb2', 'Bb2', 'Db3', 'F3'],
-  ['F2', 'A2', 'C3', 'Eb3']
-];
-// Simplified hook melody pattern
-const MAGNETIC_HOOK = ['Bb4', 'C5', 'Db5', 'F5', 'Eb5', 'Db5', 'Bb4', 'Db5', 'Ab4'];
+// 4. Jamiroquai (Deeper Underground - Godzilla)
+// Key: C# Minor | Riff focusing on C#2, E2, F#2, B1
+const JAMIROQUAI_RIFF = ['C#2', 'C#2', 'C#2', 'E2', 'C#2', 'C#2', 'B1', 'C#2'];
 
 // --- Utility: Distortion Curve ---
 function makeDistortionCurve(amount: number) {
@@ -91,8 +83,8 @@ export default function AmbientMusic() {
       reverb.connect(revGain); revGain.connect(master);
       reverbRef.current = reverb;
 
-      const dist = ctx.createWaveShaper(); dist.curve = makeDistortionCurve(350);
-      const distGain = ctx.createGain(); distGain.gain.value = 0.25;
+      const dist = ctx.createWaveShaper(); dist.curve = makeDistortionCurve(400);
+      const distGain = ctx.createGain(); distGain.gain.value = 0.3;
       dist.connect(distGain); distGain.connect(master);
       distortionRef.current = dist;
     }
@@ -113,16 +105,26 @@ export default function AmbientMusic() {
 
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+
     osc.type = type;
     osc.frequency.setValueAtTime(freq, ctx.currentTime);
     
+    // Acid sweep for jamiroquai/doom
+    if (useDist) {
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(freq * 4, ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(freq * 0.8, ctx.currentTime + duration);
+        filter.Q.value = 3;
+    }
+
     gain.gain.setValueAtTime(0, ctx.currentTime);
     gain.gain.linearRampToValueAtTime(vol, ctx.currentTime + attack);
     gain.gain.setValueAtTime(vol, ctx.currentTime + duration - release);
     gain.gain.linearRampToValueAtTime(0, ctx.currentTime + duration);
 
     if (useDist && distortionRef.current) {
-      osc.connect(gain); gain.connect(distortionRef.current);
+      osc.connect(filter); filter.connect(gain); gain.connect(distortionRef.current);
     } else if (useReverb && reverbRef.current) {
       osc.connect(gain); gain.connect(reverbRef.current); gain.connect(masterGainRef.current);
     } else {
@@ -139,9 +141,6 @@ export default function AmbientMusic() {
     intervalsRef.current.push(setInterval(() => {
       const chord = RE_CHORDS[engineStateRef.current.index % RE_CHORDS.length];
       chord.forEach(n => playNote(NOTES[n] || 220, 6, 0.05, 'sine', 1.5, 2, false, true));
-      if (Math.random() > 0.6) {
-        RE_MELODY[Math.floor(Math.random()*RE_MELODY.length)].forEach(n => playNote(NOTES[n]||440, 2, 0.03, 'triangle', 0.2, 0.5, false, true));
-      }
       engineStateRef.current.index++;
     }, 7000));
   }, [playNote]);
@@ -150,8 +149,6 @@ export default function AmbientMusic() {
     intervalsRef.current.push(setInterval(() => {
       const n = DOOM_BASS[engineStateRef.current.index % DOOM_BASS.length];
       playNote(NOTES[n]||40, 0.2, 0.5, 'sawtooth', 0.01, 0.1, true);
-      playNote((NOTES[n]||40)*1.01, 0.2, 0.3, 'square', 0.01, 0.1, true);
-      if (engineStateRef.current.index % 4 === 2) playNote(100, 0.1, 0.15, 'square', 0.01, 0.05, true);
       engineStateRef.current.index++;
     }, 200));
   }, [playNote]);
@@ -160,36 +157,26 @@ export default function AmbientMusic() {
     intervalsRef.current.push(setInterval(() => {
       const freq = NOTES[CLASSIC_RIFF[engineStateRef.current.index % CLASSIC_RIFF.length]] || 82;
       playNote(freq, 0.15, 0.4, 'sawtooth', 0.005, 0.05, true);
-      playNote(freq * 1.5, 0.15, 0.25, 'sawtooth', 0.005, 0.05, true);
+      playNote(freq * 1.5, 0.15, 0.2, 'sawtooth', 0.005, 0.05, true);
       engineStateRef.current.index++;
     }, 180));
   }, [playNote]);
 
-  const startMagnetic = useCallback(() => {
-    // 131 BPM (~458ms per beat)
-    const beat = 458;
-    
-    // Core groove interval
+  const startJamiroquai = useCallback(() => {
+    // 104 BPM (~577ms per beat)
+    const beat = 577;
     intervalsRef.current.push(setInterval(() => {
-      const chordIdx = Math.floor(engineStateRef.current.index / 8) % MAGNETIC_CHORDS.length;
-      const step = engineStateRef.current.index % 8;
+      const note = JAMIROQUAI_RIFF[engineStateRef.current.index % JAMIROQUAI_RIFF.length];
+      const freq = NOTES[note] || 69.3;
+
+      // Heavy funky bass
+      playNote(freq, 0.25, 0.6, 'sawtooth', 0.01, 0.1, true);
       
-      // Chords (bubbly plucked synth)
-      if (step === 0 || step === 3) {
-        MAGNETIC_CHORDS[chordIdx].forEach(n => playNote(NOTES[n]||200, 0.8, 0.08, 'square', 0.02, 0.4, false, true));
+      // Funky percussive elements periodically
+      if (engineStateRef.current.index % 4 === 2) {
+        playNote(40, 0.05, 0.3, 'square', 0.01, 0.02, true); // Kick
       }
-
-      // Kick-like bass punch
-      if (step === 0 || step === 4) {
-        playNote(NOTES['Bb2']||116, 0.1, 0.15, 'sine', 0.01, 0.05);
-      }
-
-      // Melody Hook
-      if (engineStateRef.current.index % 4 === 0) {
-        const melNote = MAGNETIC_HOOK[Math.floor(engineStateRef.current.index / 2) % MAGNETIC_HOOK.length];
-        playNote(NOTES[melNote]||554, 0.3, 0.05, 'triangle', 0.01, 0.15, false, true);
-      }
-
+      
       engineStateRef.current.index++;
     }, beat / 2));
   }, [playNote]);
@@ -199,10 +186,10 @@ export default function AmbientMusic() {
     if (type === 'resident-evil') startResidentEvil();
     else if (type === 'doom') startDoom();
     else if (type === 'classic') startClassic();
-    else if (type === 'magnetic') startMagnetic();
+    else if (type === 'jamiroquai') startJamiroquai();
     setIsPlaying(true); setIsInitialized(true);
     try { localStorage.setItem('music-pref', type); } catch {}
-  }, [cleanup, initAudio, startResidentEvil, startDoom, startClassic, startMagnetic]);
+  }, [cleanup, initAudio, startResidentEvil, startDoom, startClassic, startJamiroquai]);
 
   const stopMusic = useCallback(() => {
     cleanup(); if (audioCtxRef.current) audioCtxRef.current.suspend();
@@ -218,7 +205,7 @@ export default function AmbientMusic() {
 
   useEffect(() => {
     const saved = localStorage.getItem('music-pref');
-    if (saved && saved !== 'off') setActiveEngine(saved as EngineType);
+    if (saved && saved !== 'off' && saved !== 'magnetic') setActiveEngine(saved as EngineType);
     const timer = setTimeout(() => setShowTooltip(false), 5000);
     return () => clearTimeout(timer);
   }, []);
@@ -234,7 +221,7 @@ export default function AmbientMusic() {
               <MenuButton active={activeEngine==='resident-evil'&&isPlaying} onClick={()=>{startMusic('resident-evil');setMenuOpen(false);}} icon="🧟" label="Resident Evil" />
               <MenuButton active={activeEngine==='doom'&&isPlaying} onClick={()=>{startMusic('doom');setMenuOpen(false);}} icon="🔥" label="Doom Eternal" />
               <MenuButton active={activeEngine==='classic'&&isPlaying} onClick={()=>{startMusic('classic');setMenuOpen(false);}} icon="🤘" label="Metallica Style" />
-              <MenuButton active={activeEngine==='magnetic'&&isPlaying} onClick={()=>{startMusic('magnetic');setMenuOpen(false);}} icon="✨" label="Magnetic (K-Pop)" />
+              <MenuButton active={activeEngine==='jamiroquai'&&isPlaying} onClick={()=>{startMusic('jamiroquai');setMenuOpen(false);}} icon="🕶️" label="Jamiroquai (Godzilla)" />
               <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '0.2rem 0' }} />
               <MenuButton active={false} onClick={()=>{stopMusic();setMenuOpen(false);}} icon="🚫" label="Apagar Música" red />
             </motion.div>
@@ -247,8 +234,8 @@ export default function AmbientMusic() {
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '2px', height: '20px' }}>
               {[0, 1, 2, 3].map(i => (
-                <motion.div key={i} animate={isPlaying ? { height: activeEngine==='doom' ? ['8px','22px','6px','20px','8px'] : activeEngine==='magnetic' ? ['12px','24px','14px','22px','12px'] : ['6px','18px','10px','16px','6px'] } : { height: '6px' }}
-                  transition={isPlaying ? { duration: activeEngine==='doom'?0.3:activeEngine==='magnetic'?0.45:0.8, repeat: Infinity, delay: i*0.1 } : {}}
+                <motion.div key={i} animate={isPlaying ? { height: activeEngine==='jamiroquai' ? ['10px','24px','14px','22px','10px'] : activeEngine==='doom' ? ['8px','22px','6px','20px','8px'] : ['6px','18px','10px','16px','6px'] } : { height: '6px' }}
+                  transition={isPlaying ? { duration: activeEngine==='jamiroquai'?0.55:activeEngine==='doom'?0.3:0.8, repeat: Infinity, delay: i*0.1 } : {}}
                   style={{ width: '3px', height: '6px', borderRadius: '2px', background: 'white' }}
                 />
               ))}
@@ -257,8 +244,8 @@ export default function AmbientMusic() {
           <AnimatePresence>
             {showTooltip && (
               <motion.div initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:20 }}
-                style={{ position: 'absolute', right: '70px', top: '15px', background: 'rgba(15,23,42,0.9)', padding: '0.4rem 0.8rem', borderRadius: '8px', fontSize: '0.75rem', color: 'white', whiteSpace: 'nowrap', border: '1px solid rgba(59,130,246,0.2)' }}
-              >🎵 Click para música</motion.div>
+                style={{ position: 'absolute', right: '70px', top: '15px', background: 'rgba(15,23,42,0.9)', padding: '0.4rem 0.8rem', borderRadius: '8px', fontSize: '0.75rem', color: 'white', whiteSpace: 'nowrap', border: '1px solid rgba(59, 130, 246, 0.2)' }}
+              >🎵 Ambientación IT</motion.div>
             )}
           </AnimatePresence>
         </div>
