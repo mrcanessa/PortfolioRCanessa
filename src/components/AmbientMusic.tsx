@@ -4,13 +4,14 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // --- Types & Constants ---
-type EngineType = 'resident-evil' | 'doom' | 'classic';
+type EngineType = 'resident-evil' | 'doom' | 'classic' | 'magnetic';
 
 const NOTES: Record<string, number> = {
-  'E1': 41.20, 'A1': 55.00, 'D2': 73.42, 'G2': 98.00, 'B2': 123.47, 'E2': 164.81,
+  'E1': 41.20, 'F1': 43.65, 'G1': 49.00, 'A1': 55.00, 'D2': 73.42, 'G2': 98.00, 'B2': 123.47, 'E2': 164.81,
+  'Bb2': 116.54, 'Db3': 138.59, 'Eb3': 155.56, 'Gb3': 185.00, 'Ab3': 207.65, 
   'A2': 110.00, 'C3': 130.81, 'D3': 146.83, 'E3': 164.81, 'F3': 174.61,
-  'G3': 196.00, 'A3': 220.00, 'C4': 261.63, 'D4': 293.66, 'E4': 329.63,
-  'F4': 349.23, 'G4': 392.00, 'A4': 440.00, 'C5': 523.25, 'E5': 659.25,
+  'G3': 196.00, 'A3': 220.00, 'Bb3': 233.08, 'C4': 261.63, 'Db4': 277.18, 'D4': 293.66, 'Eb4': 311.13, 'E4': 329.63,
+  'F4': 349.23, 'Gb4': 369.99, 'G4': 392.00, 'Ab4': 415.30, 'A4': 440.00, 'Bb4': 466.16, 'C5': 523.25, 'Db5': 554.37, 'Eb5': 622.25, 'E5': 659.25, 'F5': 698.46,
 };
 
 // --- Engines Data ---
@@ -22,13 +23,24 @@ const RE_CHORDS = [
 ];
 const RE_MELODY = [['E5', 'C5', 'A4', 'G4'], ['F4', 'E4', 'D4', 'C4']];
 
-// 2. Doom (Industrial Metal - High Energy)
-const DOOM_BASS = ['E1', 'E1', 'F1', 'E1', 'G1', 'E1', 'F1', 'E1']; // Syncopated chugs
+// 2. Doom
+const DOOM_BASS = ['E1', 'E1', 'F1', 'E1', 'G1', 'E1', 'F1', 'E1'];
 
-// 3. Classic (Metallica - Gallop)
+// 3. Classic (Metallica)
 const CLASSIC_RIFF = ['E2', 'E2', 'E2', 'G2', 'A2', 'E2', 'E2', 'E2', 'D2', 'C2'];
 
-// --- Utility: Distortion Curve (WaveShaper) ---
+// 4. Magnetic (ILLIT) - Bubbly hook & chords
+// Chords: Bb m7 - Ab m7 - Gb maj7 - F7
+const MAGNETIC_CHORDS = [
+  ['Bb2', 'Db3', 'F3', 'Ab3'],
+  ['Ab2', 'C3', 'Eb3', 'Gb3'],
+  ['Gb2', 'Bb2', 'Db3', 'F3'],
+  ['F2', 'A2', 'C3', 'Eb3']
+];
+// Simplified hook melody pattern
+const MAGNETIC_HOOK = ['Bb4', 'C5', 'Db5', 'F5', 'Eb5', 'Db5', 'Bb4', 'Db5', 'Ab4'];
+
+// --- Utility: Distortion Curve ---
 function makeDistortionCurve(amount: number) {
   const k = typeof amount === 'number' ? amount : 50;
   const n_samples = 44100;
@@ -48,18 +60,15 @@ export default function AmbientMusic() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [showTooltip, setShowTooltip] = useState(true);
 
-  // Audio Context & Nodes
+  // Audio Refs
   const audioCtxRef = useRef<AudioContext | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
   const reverbRef = useRef<ConvolverNode | null>(null);
   const distortionRef = useRef<WaveShaperNode | null>(null);
-  
-  // Active Sound References
   const activeOscRef = useRef<OscillatorNode[]>([]);
   const intervalsRef = useRef<NodeJS.Timeout[]>([]);
   const engineStateRef = useRef({ index: 0, subIndex: 0 });
 
-  // --- Audio Setup ---
   const initAudio = useCallback(() => {
     if (!audioCtxRef.current) {
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -70,29 +79,21 @@ export default function AmbientMusic() {
       master.connect(ctx.destination);
       masterGainRef.current = master;
 
-      // Reverb (Resident Evil)
       const reverb = ctx.createConvolver();
-      const length = ctx.sampleRate * 3.5;
+      const length = ctx.sampleRate * 2.5;
       const impulse = ctx.createBuffer(2, length, ctx.sampleRate);
       for (let c = 0; c < 2; c++) {
         const d = impulse.getChannelData(c);
         for (let i = 0; i < length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, 2.5);
       }
       reverb.buffer = impulse;
-      const revGain = ctx.createGain();
-      revGain.gain.value = 0.5;
-      reverb.connect(revGain);
-      revGain.connect(master);
+      const revGain = ctx.createGain(); revGain.gain.value = 0.4;
+      reverb.connect(revGain); revGain.connect(master);
       reverbRef.current = reverb;
 
-      // Distortion (Doom/Classic)
-      const dist = ctx.createWaveShaper();
-      dist.curve = makeDistortionCurve(400);
-      dist.oversample = '4x';
-      const distGain = ctx.createGain();
-      distGain.gain.value = 0.3;
-      dist.connect(distGain);
-      distGain.connect(master);
+      const dist = ctx.createWaveShaper(); dist.curve = makeDistortionCurve(350);
+      const distGain = ctx.createGain(); distGain.gain.value = 0.25;
+      dist.connect(distGain); distGain.connect(master);
       distortionRef.current = dist;
     }
     if (audioCtxRef.current.state === 'suspended') audioCtxRef.current.resume();
@@ -106,9 +107,7 @@ export default function AmbientMusic() {
     engineStateRef.current = { index: 0, subIndex: 0 };
   }, []);
 
-  // --- Synthesis Helpers ---
-
-  const playNote = useCallback((freq: number, duration: number, vol: number, type: OscillatorType, attack: number, release: number, useDist: boolean = false) => {
+  const playNote = useCallback((freq: number, duration: number, vol: number, type: OscillatorType, attack: number, release: number, useDist: boolean = false, useReverb: boolean = false) => {
     const ctx = audioCtxRef.current;
     if (!ctx || !masterGainRef.current) return;
 
@@ -123,12 +122,11 @@ export default function AmbientMusic() {
     gain.gain.linearRampToValueAtTime(0, ctx.currentTime + duration);
 
     if (useDist && distortionRef.current) {
-      osc.connect(gain);
-      gain.connect(distortionRef.current);
-    } else if (reverbRef.current) {
-      osc.connect(gain);
-      gain.connect(reverbRef.current);
-      gain.connect(masterGainRef.current);
+      osc.connect(gain); gain.connect(distortionRef.current);
+    } else if (useReverb && reverbRef.current) {
+      osc.connect(gain); gain.connect(reverbRef.current); gain.connect(masterGainRef.current);
+    } else {
+      osc.connect(gain); gain.connect(masterGainRef.current);
     }
 
     osc.start();
@@ -137,92 +135,87 @@ export default function AmbientMusic() {
     osc.onended = () => activeOscRef.current = activeOscRef.current.filter(x => x !== osc);
   }, []);
 
-  // --- Engines Implementation ---
-
   const startResidentEvil = useCallback(() => {
-    const interval = setInterval(() => {
+    intervalsRef.current.push(setInterval(() => {
       const chord = RE_CHORDS[engineStateRef.current.index % RE_CHORDS.length];
-      chord.forEach((n, i) => playNote(NOTES[n] || 220, 6, 0.04, 'sine', 1.5, 2, false));
-      
-      if (Math.random() > 0.5) {
-        const mel = RE_MELODY[Math.floor(Math.random() * RE_MELODY.length)];
-        mel.forEach((n, i) => playNote(NOTES[n] || 440, 2, 0.02, 'triangle', 0.2, 0.5, false));
+      chord.forEach(n => playNote(NOTES[n] || 220, 6, 0.05, 'sine', 1.5, 2, false, true));
+      if (Math.random() > 0.6) {
+        RE_MELODY[Math.floor(Math.random()*RE_MELODY.length)].forEach(n => playNote(NOTES[n]||440, 2, 0.03, 'triangle', 0.2, 0.5, false, true));
       }
       engineStateRef.current.index++;
-    }, 7000);
-    intervalsRef.current.push(interval);
+    }, 7000));
   }, [playNote]);
 
   const startDoom = useCallback(() => {
-    // Aggressive industrial bass
-    const interval = setInterval(() => {
-      const note = DOOM_BASS[engineStateRef.current.index % DOOM_BASS.length];
-      const freq = NOTES[note] || 40;
-      // Double oscillators for fat tone
-      playNote(freq, 0.2, 0.6, 'sawtooth', 0.01, 0.1, true);
-      playNote(freq * 1.01, 0.2, 0.4, 'square', 0.01, 0.1, true);
-      
-      // Industrial noise/snare hint
-      if (engineStateRef.current.index % 4 === 2) {
-        playNote(100, 0.1, 0.2, 'square', 0.01, 0.05, true);
-      }
+    intervalsRef.current.push(setInterval(() => {
+      const n = DOOM_BASS[engineStateRef.current.index % DOOM_BASS.length];
+      playNote(NOTES[n]||40, 0.2, 0.5, 'sawtooth', 0.01, 0.1, true);
+      playNote((NOTES[n]||40)*1.01, 0.2, 0.3, 'square', 0.01, 0.1, true);
+      if (engineStateRef.current.index % 4 === 2) playNote(100, 0.1, 0.15, 'square', 0.01, 0.05, true);
       engineStateRef.current.index++;
-    }, 200); // Fast tempo
-    intervalsRef.current.push(interval);
+    }, 200));
   }, [playNote]);
 
   const startClassic = useCallback(() => {
-    // Metallica-style galloping riff
-    const interval = setInterval(() => {
-      const note = CLASSIC_RIFF[engineStateRef.current.index % CLASSIC_RIFF.length];
-      const freq = NOTES[note] || 82;
-      
-      // Determine rhythm: Gallop (1-2-3, 1-2-3)
-      const isGallop = engineStateRef.current.index % 10 < 6;
-      const speed = isGallop ? 150 : 300;
-      
-      // Power chord (Root + Fifth)
-      playNote(freq, 0.15, 0.5, 'sawtooth', 0.005, 0.05, true);
-      playNote(freq * 1.5, 0.15, 0.3, 'sawtooth', 0.005, 0.05, true);
-      
+    intervalsRef.current.push(setInterval(() => {
+      const freq = NOTES[CLASSIC_RIFF[engineStateRef.current.index % CLASSIC_RIFF.length]] || 82;
+      playNote(freq, 0.15, 0.4, 'sawtooth', 0.005, 0.05, true);
+      playNote(freq * 1.5, 0.15, 0.25, 'sawtooth', 0.005, 0.05, true);
       engineStateRef.current.index++;
-    }, 180);
-    intervalsRef.current.push(interval);
+    }, 180));
   }, [playNote]);
 
-  // --- Control Logic ---
+  const startMagnetic = useCallback(() => {
+    // 131 BPM (~458ms per beat)
+    const beat = 458;
+    
+    // Core groove interval
+    intervalsRef.current.push(setInterval(() => {
+      const chordIdx = Math.floor(engineStateRef.current.index / 8) % MAGNETIC_CHORDS.length;
+      const step = engineStateRef.current.index % 8;
+      
+      // Chords (bubbly plucked synth)
+      if (step === 0 || step === 3) {
+        MAGNETIC_CHORDS[chordIdx].forEach(n => playNote(NOTES[n]||200, 0.8, 0.08, 'square', 0.02, 0.4, false, true));
+      }
+
+      // Kick-like bass punch
+      if (step === 0 || step === 4) {
+        playNote(NOTES['Bb2']||116, 0.1, 0.15, 'sine', 0.01, 0.05);
+      }
+
+      // Melody Hook
+      if (engineStateRef.current.index % 4 === 0) {
+        const melNote = MAGNETIC_HOOK[Math.floor(engineStateRef.current.index / 2) % MAGNETIC_HOOK.length];
+        playNote(NOTES[melNote]||554, 0.3, 0.05, 'triangle', 0.01, 0.15, false, true);
+      }
+
+      engineStateRef.current.index++;
+    }, beat / 2));
+  }, [playNote]);
 
   const startMusic = useCallback((type: EngineType) => {
-    cleanup();
-    initAudio();
-    setActiveEngine(type);
-    
+    cleanup(); initAudio(); setActiveEngine(type);
     if (type === 'resident-evil') startResidentEvil();
     else if (type === 'doom') startDoom();
     else if (type === 'classic') startClassic();
-
-    setIsPlaying(true);
-    setIsInitialized(true);
+    else if (type === 'magnetic') startMagnetic();
+    setIsPlaying(true); setIsInitialized(true);
     try { localStorage.setItem('music-pref', type); } catch {}
-  }, [cleanup, initAudio, startResidentEvil, startDoom, startClassic]);
+  }, [cleanup, initAudio, startResidentEvil, startDoom, startClassic, startMagnetic]);
 
   const stopMusic = useCallback(() => {
-    cleanup();
-    if (audioCtxRef.current) audioCtxRef.current.suspend();
-    setIsPlaying(false);
-    try { localStorage.setItem('music-pref', 'off'); } catch {}
+    cleanup(); if (audioCtxRef.current) audioCtxRef.current.suspend();
+    setIsPlaying(false); try { localStorage.setItem('music-pref', 'off'); } catch {}
   }, [cleanup]);
 
   const handleToggle = useCallback(() => {
     if (!isPlaying) {
       const saved = typeof window !== 'undefined' ? localStorage.getItem('music-pref') : null;
       startMusic(saved && saved !== 'off' ? (saved as EngineType) : activeEngine);
-    } else {
-      setMenuOpen(!menuOpen);
-    }
+    } else setMenuOpen(!menuOpen);
   }, [isPlaying, activeEngine, startMusic, menuOpen]);
 
-  // Pre-load preference
   useEffect(() => {
     const saved = localStorage.getItem('music-pref');
     if (saved && saved !== 'off') setActiveEngine(saved as EngineType);
@@ -231,145 +224,55 @@ export default function AmbientMusic() {
   }, []);
 
   return (
-    <>
-      <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-        
-        {/* Menu de Selección */}
+    <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', zIndex: 1000, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
         <AnimatePresence>
           {menuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: 10, scale: 0.9 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.9 }}
-              style={{
-                background: 'rgba(15, 23, 42, 0.95)',
-                backdropFilter: 'blur(16px)',
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-                borderRadius: '16px',
-                padding: '0.8rem',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '0.5rem',
-                boxShadow: '0 10px 30px rgba(0,0,0,0.5)',
-                marginBottom: '0.5rem'
-              }}
+              initial={{ opacity: 0, y: 10, scale: 0.9 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: 10, scale: 0.9 }}
+              style={{ background: 'rgba(15, 23, 42, 0.95)', backdropFilter: 'blur(16px)', border: '1px solid rgba(59, 130, 246, 0.2)', borderRadius: '16px', padding: '0.8rem', display: 'flex', flexDirection: 'column', gap: '0.4rem', boxShadow: '0 10px 40px rgba(0,0,0,0.6)', marginBottom: '0.5rem' }}
             >
-              <MenuButton 
-                active={activeEngine === 'resident-evil' && isPlaying} 
-                onClick={() => { startMusic('resident-evil'); setMenuOpen(false); }}
-                icon="🧟" label="Resident Evil" 
-              />
-              <MenuButton 
-                active={activeEngine === 'doom' && isPlaying} 
-                onClick={() => { startMusic('doom'); setMenuOpen(false); }}
-                icon="🔥" label="Doom Eternal" 
-              />
-              <MenuButton 
-                active={activeEngine === 'classic' && isPlaying} 
-                onClick={() => { startMusic('classic'); setMenuOpen(false); }}
-                icon="🤘" label="Metallica Style" 
-              />
+              <MenuButton active={activeEngine==='resident-evil'&&isPlaying} onClick={()=>{startMusic('resident-evil');setMenuOpen(false);}} icon="🧟" label="Resident Evil" />
+              <MenuButton active={activeEngine==='doom'&&isPlaying} onClick={()=>{startMusic('doom');setMenuOpen(false);}} icon="🔥" label="Doom Eternal" />
+              <MenuButton active={activeEngine==='classic'&&isPlaying} onClick={()=>{startMusic('classic');setMenuOpen(false);}} icon="🤘" label="Metallica Style" />
+              <MenuButton active={activeEngine==='magnetic'&&isPlaying} onClick={()=>{startMusic('magnetic');setMenuOpen(false);}} icon="✨" label="Magnetic (K-Pop)" />
               <hr style={{ border: 'none', borderTop: '1px solid rgba(255,255,255,0.1)', margin: '0.2rem 0' }} />
-              <MenuButton 
-                active={false} 
-                onClick={() => { stopMusic(); setMenuOpen(false); }}
-                icon="🚫" label="Apagar Música" red
-              />
+              <MenuButton active={false} onClick={()=>{stopMusic();setMenuOpen(false);}} icon="🚫" label="Apagar Música" red />
             </motion.div>
           )}
         </AnimatePresence>
-
-        {/* Botón Principal Toggle */}
         <div style={{ position: 'relative' }}>
           <motion.button
-            onClick={handleToggle}
-            className="music-toggle"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '50%',
-              background: isPlaying 
-                ? 'linear-gradient(135deg, var(--accent) 0%, var(--accent-green) 100%)'
-                : 'linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%)',
-              border: isPlaying ? '2px solid rgba(255,255,255,0.4)' : '2px solid rgba(59,130,246,0.3)',
-              color: 'white',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              backdropFilter: 'blur(12px)',
-              boxShadow: isPlaying ? '0 0 20px rgba(34,197,94,0.3)' : 'none',
-              transition: 'all 0.3s ease'
-            }}
+            onClick={handleToggle} className="music-toggle" whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.95 }}
+            style={{ width: '56px', height: '56px', borderRadius: '50%', background: isPlaying ? 'linear-gradient(135deg, var(--accent) 0%, var(--accent-green) 100%)' : 'linear-gradient(135deg, rgba(30,41,59,0.9) 0%, rgba(15,23,42,0.95) 100%)', border: isPlaying ? '2px solid rgba(255,255,255,0.4)': '2px solid rgba(59,130,246,0.3)', color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(12px)', boxShadow: isPlaying ? '0 0 20px rgba(34,197,94,0.3)' : 'none' }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '2px', height: '20px' }}>
               {[0, 1, 2, 3].map(i => (
-                <motion.div
-                  key={i}
-                  animate={isPlaying ? {
-                    height: activeEngine === 'doom' ? ['8px', '22px', '6px', '20px', '8px'] : 
-                            activeEngine === 'classic' ? ['6px', '16px', '6px', '16px', '6px'] :
-                            ['6px', '18px', '10px', '16px', '6px'],
-                  } : { height: '6px' }}
-                  transition={isPlaying ? {
-                    duration: activeEngine === 'doom' ? 0.4 + i*0.1 : 0.8 + i*0.15,
-                    repeat: Infinity,
-                    delay: i * 0.1,
-                  } : {}}
-                  style={{
-                    width: '3px',
-                    height: '6px',
-                    borderRadius: '2px',
-                    background: 'white',
-                  }}
+                <motion.div key={i} animate={isPlaying ? { height: activeEngine==='doom' ? ['8px','22px','6px','20px','8px'] : activeEngine==='magnetic' ? ['12px','24px','14px','22px','12px'] : ['6px','18px','10px','16px','6px'] } : { height: '6px' }}
+                  transition={isPlaying ? { duration: activeEngine==='doom'?0.3:activeEngine==='magnetic'?0.45:0.8, repeat: Infinity, delay: i*0.1 } : {}}
+                  style={{ width: '3px', height: '6px', borderRadius: '2px', background: 'white' }}
                 />
               ))}
             </div>
           </motion.button>
-
-          {/* Tooltip */}
           <AnimatePresence>
             {showTooltip && (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}
+              <motion.div initial={{ opacity:0, x:20 }} animate={{ opacity:1, x:0 }} exit={{ opacity:0, x:20 }}
                 style={{ position: 'absolute', right: '70px', top: '15px', background: 'rgba(15,23,42,0.9)', padding: '0.4rem 0.8rem', borderRadius: '8px', fontSize: '0.75rem', color: 'white', whiteSpace: 'nowrap', border: '1px solid rgba(59,130,246,0.2)' }}
-              >
-                🎵 Click para música
-              </motion.div>
+              >🎵 Click para música</motion.div>
             )}
           </AnimatePresence>
         </div>
-      </div>
-    </>
+    </div>
   );
 }
 
 function MenuButton({ icon, label, onClick, active, red }: { icon: string, label: string, onClick: () => void, active: boolean, red?: boolean }) {
   return (
-    <motion.button
-      onClick={onClick}
-      whileHover={{ x: 5, background: 'rgba(255,255,255,0.08)' }}
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.8rem',
-        padding: '0.6rem 1rem',
-        width: '100%',
-        borderRadius: '10px',
-        color: red ? '#f87171' : active ? 'var(--accent-green)' : 'rgba(255,255,255,0.8)',
-        fontSize: '0.9rem',
-        fontWeight: active ? 700 : 500,
-        background: active ? 'rgba(34,197,94,0.1)' : 'transparent',
-        transition: 'all 0.2s ease',
-        textAlign: 'left',
-        whiteSpace: 'nowrap'
-      }}
+    <motion.button onClick={onClick} whileHover={{ x: 5, background: 'rgba(255,255,255,0.08)' }}
+      style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', padding: '0.6rem 1rem', width: '100%', borderRadius: '10px', color: red ? '#f87171' : active ? 'var(--accent-green)' : 'rgba(255,255,255,0.8)', fontSize: '0.85rem', fontWeight: active ? 700 : 500, background: active ? 'rgba(34,197,94,0.1)' : 'transparent', textAlign: 'left', whiteSpace: 'nowrap' }}
     >
-      <span style={{ fontSize: '1.1rem' }}>{icon}</span>
-      {label}
-      {active && <motion.div layoutId="active-dot" style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--accent-green)', marginLeft: 'auto' }} />}
+      <span style={{ fontSize: '1rem' }}>{icon}</span> {label}
+      {active && <motion.div layoutId="active-dot" style={{ width: '4px', height: '4px', borderRadius: '50%', background: 'var(--accent-green)', marginLeft: 'auto' }} />}
     </motion.button>
   );
 }
