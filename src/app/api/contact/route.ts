@@ -1,17 +1,16 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 
 export async function POST(request: Request) {
   try {
-    const apiKey = process.env.RESEND_API_KEY;
-    
-    // Verificación de API Key
-    if (!apiKey) {
-      console.error('ERROR: La variable de entorno RESEND_API_KEY no está configurada.');
+    const user = process.env.GMAIL_USER;
+    const pass = process.env.GMAIL_PASS;
+
+    if (!user || !pass) {
+      console.error('ERROR: Las variables GMAIL_USER o GMAIL_PASS no están configuradas.');
       return NextResponse.json({ error: 'Configuración de correo incompleta' }, { status: 500 });
     }
 
-    const resend = new Resend(apiKey);
     const data = await request.json();
     const { name, email, message } = data;
 
@@ -19,12 +18,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Faltan campos requeridos' }, { status: 400 });
     }
 
-    // 1. Notificación para Marcelo (Dueño)
-    await resend.emails.send({
-      from: 'Portafolio <onboarding@resend.dev>',
-      to: 'marcelo.rcanessa@gmail.com',
-      subject: `Coordinar reunión inicial - ${name}`,
+    // Configuración del transporte de Nodemailer para Gmail
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: user,
+        pass: pass, // Aquí va la Contraseña de Aplicación de 16 letras
+      },
+    });
+
+    // 1. Notificación para Marcelo (Desde Marcelo para Marcelo)
+    await transporter.sendMail({
+      from: `"${name}" <${user}>`, // Usamos tu correo como remitente real
+      to: user,
       replyTo: email,
+      subject: `Coordinar reunión inicial - ${name}`,
       html: `
         <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
           <h2 style="color: #3b82f6;">Nueva Consulta de Portafolio</h2>
@@ -34,12 +42,12 @@ export async function POST(request: Request) {
           <p><strong>Mensaje:</strong></p>
           <p style="white-space: pre-wrap;">${message}</p>
         </div>
-      `
+      `,
     });
 
-    // 2. Respuesta automática para el Cliente (Respaldo)
-    await resend.emails.send({
-      from: 'Marcelo Rodriguez Canessa <onboarding@resend.dev>',
+    // 2. Respuesta automática para el Cliente (Desde Marcelo para el Cliente)
+    await transporter.sendMail({
+      from: `"Marcelo Rodriguez Canessa" <${user}>`,
       to: email,
       subject: 'Propuesta recibida',
       html: `
@@ -53,12 +61,12 @@ export async function POST(request: Request) {
           <p><strong>Marcelo Rodriguez Canessa</strong><br />
           Ingeniería y Consultoría Tecnológica</p>
         </div>
-      `
+      `,
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error enviando el correo:', error);
+    console.error('Error enviando el correo con Nodemailer:', error);
     return NextResponse.json({ error: 'Error del servidor al procesar la solicitud' }, { status: 500 });
   }
 }
