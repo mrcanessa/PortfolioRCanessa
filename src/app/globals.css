@@ -34,14 +34,6 @@ a {
   transition: all 0.2s ease;
 }
 
-.nav-menu a {
-  color: var(--text-muted);
-}
-
-.nav-menu a:hover {
-  color: #f8fafc;
-}
-
 button {
   background: none;
   border: none;
@@ -99,12 +91,6 @@ p {
   padding: 0 2rem;
 }
 
-@media (max-width: 640px) {
-  .container {
-    padding: 0 1.25rem;
-  }
-}
-
 .hidden-mobile {
   display: block;
 }
@@ -122,6 +108,7 @@ p {
   font-weight: 600;
   transition: all 0.2s ease;
   gap: 0.5rem;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -177,16 +164,47 @@ p {
   box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
 }
 
-.tag {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 999px;
-  background: rgba(59, 130, 246, 0.1);
-  color: #93c5fd;
-  font-size: 0.75rem;
-  font-weight: 600;
+.nav-link {
+  position: relative;
+  font-size: 0.85rem;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.nav-link:after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--accent);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: white;
+}
+
+.nav-link:hover:after {
+  width: 100%;
+}
+
+.hover-glow:hover {
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.1);
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
 }
 
 /* Responsividad para móviles y tabletas */
@@ -196,29 +214,23 @@ p {
   }
   
   h1 {
-    font-size: 2.25rem !important;
+    font-size: 2.5rem !important;
   }
   
   h2 {
-    font-size: 1.8rem !important;
+    font-size: 2rem !important;
   }
   
   section {
-    padding: 4rem 0 !important;
-  }
-
-  .nav-menu {
-    display: none !important; /* Hide standard nav on very small screens, or simplify */
+    padding: 6rem 0 !important;
   }
 
   .nav-header {
-    justify-content: center !important;
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
   }
   
-  .card {
-    padding: 1.5rem;
-  }
-
   .hidden-mobile {
     display: none !important;
   }
@@ -227,7 +239,7 @@ p {
     display: block !important;
   }
   
-  section {
-    overflow: visible !important;
+  .card {
+    padding: 1.5rem;
   }
 }
