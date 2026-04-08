@@ -74,9 +74,10 @@ export default function InteractiveProjectView({ project }: { project: Project }
 
       </div>
 
-      {/* Sensor de interacciones lateral invisible */}
+      {/* Sensor de interacciones lateral invisible SOLO PARA ESCRITORIO */}
       <div 
-         style={{ position: 'fixed', right: 0, top: 0, width: '100px', height: '100vh', zIndex: 90 }}
+         className="hidden-mobile"
+         style={{ position: 'fixed', right: 0, top: 0, width: '80px', height: '100vh', zIndex: 80 }}
          onMouseEnter={() => setHoverAreaActive(true)}
       />
 
@@ -98,9 +99,14 @@ export default function InteractiveProjectView({ project }: { project: Project }
           boxShadow: '-15px 0 50px rgba(0,0,0,0.6)',
           zIndex: 100,
           padding: '3rem 2.5rem',
-          overflowY: 'auto'
+          overflowY: 'auto',
+          pointerEvents: isVisible ? 'auto' : 'none'
         }}
-        onMouseLeave={() => { setHoverAreaActive(false); setSidebarOpen(false); }}
+        onMouseLeave={() => { 
+          // En escritorio sirve para ocultar. En móvil esto no suele dispararse.
+          setHoverAreaActive(false); 
+          setSidebarOpen(false); 
+        }}
       >
         {/* Cabecera del Sidebar */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3.5rem' }}>
@@ -109,8 +115,9 @@ export default function InteractiveProjectView({ project }: { project: Project }
           </h3>
           <button 
              onClick={() => { setSidebarOpen(false); setHoverAreaActive(false); }}
-             style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', fontSize: '1.5rem' }}
-             className="hidden-desktop" // On mobile give them an explicitly visible close button
+             onTouchEnd={() => { setSidebarOpen(false); setHoverAreaActive(false); }}
+             style={{ background: 'rgba(255,255,255,0.1)', border: 'none', color: 'white', cursor: 'pointer', fontSize: '1.5rem', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+             className="close-sidebar-btn hidden-desktop"
           >
              ×
           </button>
