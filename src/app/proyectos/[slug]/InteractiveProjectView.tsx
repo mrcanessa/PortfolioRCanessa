@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Mail, Cloud, Lock, ArrowLeft, Star, Quote, ChevronLeft } from 'lucide-react';
 import type { Project } from '@/data/projects';
 
@@ -13,16 +14,45 @@ const iconMap: Record<string, React.ElementType> = {
 };
 
 export default function InteractiveProjectView({ project }: { project: Project }) {
+  const router = useRouter();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [hoverAreaActive, setHoverAreaActive] = useState(false);
+  
+  // Estados para detectar el gesto Swipe "atrás" en celulares
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
   
   const IconComponent = iconMap[project.icon] || Mail;
 
   // The sidebar opens when hoverAreaActive is true OR sidebarOpen is explicitly clicked
   const isVisible = sidebarOpen || hoverAreaActive;
 
+  const handleTouchStart = (e: React.TouchEvent) => setTouchStart(e.targetTouches[0].clientX);
+  const handleTouchMove = (e: React.TouchEvent) => setTouchEnd(e.targetTouches[0].clientX);
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchEnd - touchStart;
+    
+    // Gesto de Swipe hacia la derecha (de izquierda a derecha > 100px)
+    if (distance > 100) {
+      if (!isVisible) {
+        // Si el panel de experiencias no está viendo, retrocedemos a Inicio
+        router.push('/');
+      }
+    }
+    
+    // Limpiar estados táctiles del gesto
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
+
   return (
-    <div style={{ paddingTop: '100px', paddingBottom: '120px', minHeight: '100vh', position: 'relative', overflowX: 'hidden' }}>
+    <div 
+      style={{ paddingTop: '100px', paddingBottom: '120px', minHeight: '100vh', position: 'relative', overflowX: 'hidden' }}
+      onTouchStart={handleTouchStart}
+      onTouchMove={handleTouchMove}
+      onTouchEnd={handleTouchEnd}
+    >
       
       {/* Contenedor Principal Expandido */}
       <div className="container" style={{ maxWidth: '1100px', margin: '0 auto', transition: 'padding 0.4s ease' }}>
