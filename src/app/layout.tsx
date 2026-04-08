@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
+import CustomCursor from '@/components/CustomCursor';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
@@ -18,6 +19,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={inter.className}>
+        <CustomCursor />
         <nav style={{ padding: '1.25rem 0', position: 'fixed', top: 0, width: '100%', zIndex: 50, background: 'rgba(15, 23, 42, 0.85)', backdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
           <div className="container nav-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ fontWeight: '800', fontSize: '1.4rem', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>

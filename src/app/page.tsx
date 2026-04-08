@@ -118,7 +118,7 @@ export default function Home() {
       <section id="servicios" style={{ padding: '6rem 0', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid var(--card-border)', borderBottom: '1px solid var(--card-border)' }}>
         <div className="container">
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4rem', alignItems: 'center' }}>
-            <div style={{ flex: '1 1 400px' }}>
+            <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} style={{ flex: '1 1 400px' }}>
               <h2 style={{ marginBottom: '1.5rem' }}>Especialización Técnica Transversal</h2>
               <p style={{ marginBottom: '2rem' }}>Entendemos que la informática de hoy no son máquinas aisladas. Es un ecosistema global. Proveemos asesoramiento abarcando todas las áreas para solidificar sus cimientos digitales.</p>
               <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
@@ -126,13 +126,13 @@ export default function Home() {
                 <li style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}><Database color="var(--accent)" /> SQL y Bases de Datos (Optimización)</li>
                 <li style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}><ShieldCheck color="var(--accent)" /> Cumplimiento y Políticas ISO (Continuidad)</li>
               </ul>
-            </div>
-            <div style={{ flex: '1 1 400px', display: 'flex', justifyContent: 'center' }}>
+            </motion.div>
+            <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6, delay: 0.2 }} style={{ flex: '1 1 400px', display: 'flex', justifyContent: 'center' }}>
                <div style={{ width: '100%', height: '300px', borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, rgba(59,130,246,0.1) 0%, rgba(15,23,42,0.8) 100%)', border: '1px solid var(--card-border)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
                  <div style={{ position: 'absolute', width: '150%', height: '150%', background: 'radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 60%)', animation: 'spin 10s linear infinite' }} />
                  <Server size={64} color="var(--accent)" style={{ opacity: 0.5 }} />
                </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -141,7 +141,7 @@ export default function Home() {
       <section id="contacto" style={{ padding: '8rem 0' }}>
         <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '4rem' }}>
           
-          <form onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          <motion.form initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }} onSubmit={handleSubmit} className="card" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
             <h2 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>Hablemos de su proyecto</h2>
             <p style={{ fontSize: '0.9rem', marginBottom: '1rem' }}>Envíeme sus requerimientos para coordinar una reunión inicial.</p>
             <div>
@@ -166,14 +166,14 @@ export default function Home() {
             </button>
             {status === 'success' && <p style={{ color: '#4ade80', textAlign: 'center', marginTop: '1rem', fontWeight: 500 }}>Mensaje recibido. Nos contactaremos a la brevedad.</p>}
             {status === 'error' && <p style={{ color: '#f87171', textAlign: 'center', marginTop: '1rem', fontWeight: 500 }}>Error de conexión con la base de datos local. Intente nuevamente.</p>}
-          </form>
+          </motion.form>
 
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <h3 style={{ fontSize: '1.8rem', marginBottom: '1rem' }}>Gestión Administrativa</h3>
             <p style={{ marginBottom: '2rem' }}>Pague facturas o anticipos de manera electrónica para mantener su contabilidad ágil. Escanee el código desde su aplicación bancaria o billetera virtual preferida.</p>
             
             <PaymentQR amount={500.00} concept="Consultoría Arquitectura Cloud (Por Defecto)" />
-          </div>
+          </motion.div>
 
         </div>
       </section>
