@@ -18,7 +18,7 @@ export default function ParallaxSection({ children, offset = 50 }: ParallaxProps
   const y = useTransform(scrollYProgress, [0, 1], [-offset, offset]);
 
   return (
-    <div ref={ref} style={{ position: 'relative', overflow: 'hidden' }}>
+    <div ref={ref} style={{ position: 'relative' }}>
       <motion.div style={{ y }}>
         {children}
       </motion.div>

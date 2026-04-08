@@ -99,6 +99,20 @@ p {
   padding: 0 2rem;
 }
 
+@media (max-width: 640px) {
+  .container {
+    padding: 0 1.25rem;
+  }
+}
+
+.hidden-mobile {
+  display: block;
+}
+
+.hidden-desktop {
+  display: none !important;
+}
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -203,5 +217,17 @@ p {
   
   .card {
     padding: 1.5rem;
+  }
+
+  .hidden-mobile {
+    display: none !important;
+  }
+
+  .hidden-desktop {
+    display: block !important;
+  }
+  
+  section {
+    overflow: visible !important;
   }
 }

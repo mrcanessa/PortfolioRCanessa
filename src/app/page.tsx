@@ -40,7 +40,7 @@ export default function Home() {
   return (
     <>
       {/* Hero Section */}
-      <section style={{ minHeight: '85vh', display: 'flex', alignItems: 'center', position: 'relative', overflowX: 'hidden' }}>
+      <section style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', position: 'relative', padding: '4rem 0' }}>
         <div className="container">
           <ParallaxSection offset={80}>
             <motion.div
@@ -95,7 +95,7 @@ export default function Home() {
              <p style={{ maxWidth: '600px', margin: '0 auto' }}>Implementaciones corporativas reales enfocadas en rendimiento, seguridad y ahorro de costos.</p>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
             {projects.map((project, index) => {
               const IconComponent = iconMap[project.icon] || Mail;
 
