@@ -29,7 +29,7 @@ export async function getDb(): Promise<Database> {
     });
 
     // Crear las tablas si no existen
-    await dbInstance.exec(`
+    await dbInstance!.exec(`
       CREATE TABLE IF NOT EXISTS inquiries (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
@@ -47,5 +47,5 @@ export async function getDb(): Promise<Database> {
       );
     `);
   }
-  return dbInstance;
+  return dbInstance!;
 }
