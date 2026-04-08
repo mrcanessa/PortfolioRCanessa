@@ -5,6 +5,14 @@ import ParallaxSection from '@/components/ParallaxSection';
 import PaymentQR from '@/components/PaymentQR';
 import { motion } from 'framer-motion';
 import { Server, Cloud, ShieldCheck, Mail, Database, ArrowRight, Lock } from 'lucide-react';
+import Link from 'next/link';
+import { projects } from '@/data/projects';
+
+const iconMap: Record<string, React.ElementType> = {
+  Mail: Mail,
+  Cloud: Cloud,
+  Lock: Lock
+};
 
 export default function Home() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -88,28 +96,47 @@ export default function Home() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2rem' }}>
-            
-            <motion.div className="card" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}>
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}><span className="tag">Workspace</span> <span className="tag">Migración</span></div>
-              <Mail size={32} color="var(--accent)" style={{ marginBottom: '1rem' }} />
-              <h3 style={{ fontSize: '1.4rem', marginBottom: '1rem' }}>Migración a Google Workspace</h3>
-              <p>Transición de más de 500 cuentas desde servidores On-Premise a la nube de Google. Implementación de políticas MDM (Mobile Device Management), auditoría de Drive compartidos y enrutamiento avanzado de correos sin "downtime".</p>
-            </motion.div>
+            {projects.map((project, index) => {
+              const IconComponent = iconMap[project.icon] || Mail;
 
-            <motion.div className="card" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}>
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}><span className="tag">Cloud computing</span> <span className="tag">AWS</span></div>
-              <Cloud size={32} color="var(--accent)" style={{ marginBottom: '1rem' }} />
-              <h3 style={{ fontSize: '1.4rem', marginBottom: '1rem' }}>Infraestructura Híbrida en AWS</h3>
-              <p>Rediseño de red interna mediante Amazon VPC, despliegue de clústeres EC2 con Auto-Scaling y bases de datos RDS en Multi-AZ. Ahorro del 35% en costos operativos mediante la eliminación de hardware obsoleto.</p>
-            </motion.div>
+              // Animaciones distintas según el orden del proyecto
+              let initialAnim = {};
+              let whileAnim = {};
 
-            <motion.div className="card" initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }}>
-              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}><span className="tag">Cybersec</span> <span className="tag">Redes</span></div>
-              <Lock size={32} color="var(--accent)" style={{ marginBottom: '1rem' }} />
-              <h3 style={{ fontSize: '1.4rem', marginBottom: '1rem' }}>Seguridad Perimetral Fortinet</h3>
-              <p>Auditoría de ciberseguridad e instalación de Firewalls FortiGate. Despliegue de VPNs seguras (IPsec / SSL) para más de 200 empleados remotos garantizando el cumplimiento de normas corporativas de protección de datos.</p>
-            </motion.div>
+              if (index === 0) {
+                initialAnim = { opacity: 0, x: -50 };
+                whileAnim = { opacity: 1, x: 0 };
+              } else if (index === 1) {
+                initialAnim = { opacity: 0, scale: 0.8 };
+                whileAnim = { opacity: 1, scale: 1 };
+              } else {
+                initialAnim = { opacity: 0, x: 50 };
+                whileAnim = { opacity: 1, x: 0 };
+              }
 
+              return (
+                <Link href={`/proyectos/${project.slug}`} key={project.id} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+                  <motion.div 
+                    className="card hover-glow" 
+                    initial={initialAnim} 
+                    whileInView={whileAnim} 
+                    viewport={{ once: true }} 
+                    transition={{ duration: 0.5, delay: index * 0.1 }}
+                    style={{ height: '100%', cursor: 'pointer' }}
+                  >
+                    <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                      {project.tags.slice(0, 2).map((tag) => <span key={tag} className="tag">{tag}</span>)}
+                    </div>
+                    <IconComponent size={36} color="var(--accent)" style={{ marginBottom: '1.5rem' }} />
+                    <h3 style={{ fontSize: '1.35rem', marginBottom: '0.8rem', lineHeight: 1.2 }}>{project.title}</h3>
+                    <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>{project.shortDescription}</p>
+                    <div style={{ marginTop: '1.5rem', fontWeight: 600, fontSize: '0.85rem', color: 'white', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                       Explorar Caso <ArrowRight size={14} color="var(--accent)" />
+                    </div>
+                  </motion.div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
