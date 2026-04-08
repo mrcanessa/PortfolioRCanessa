@@ -192,7 +192,7 @@ export default function Home() {
               {status === 'loading' ? 'Procesando...' : 'Solicitar Propuesta Comercial'}
             </button>
             {status === 'success' && <p style={{ color: '#4ade80', textAlign: 'center', marginTop: '1rem', fontWeight: 500 }}>Mensaje recibido. Nos contactaremos a la brevedad.</p>}
-            {status === 'error' && <p style={{ color: '#f87171', textAlign: 'center', marginTop: '1rem', fontWeight: 500 }}>Error de conexión con la base de datos local. Intente nuevamente.</p>}
+            {status === 'error' && <p style={{ color: '#f87171', textAlign: 'center', marginTop: '1rem', fontWeight: 500 }}>Error al enviar el mensaje. Verifique que la configuración de correo esté activa.</p>}
           </motion.form>
 
           <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.2 }} style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>

@@ -6,6 +6,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
+    // Verificación de API Key
+    if (!process.env.RESEND_API_KEY) {
+      console.error('ERROR: La variable de entorno RESEND_API_KEY no está configurada en Vercel.');
+      return NextResponse.json({ error: 'Configuración de correo incompleta' }, { status: 500 });
+    }
+
     const data = await request.json();
     const { name, email, message } = data;
 
