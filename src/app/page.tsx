@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import ParallaxSection from '@/components/ParallaxSection';
 import ParticleBackground from '@/components/ParticleBackground';
 import StatsCounter from '@/components/StatsCounter';
@@ -56,16 +57,58 @@ export default function Home() {
   return (
     <>
       {/* ==================== HERO SECTION ==================== */}
-      <section style={{ minHeight: '92vh', display: 'flex', alignItems: 'center', position: 'relative', padding: '6rem 0', overflow: 'hidden' }}>
-        {/* Particle Background */}
+      <section style={{ minHeight: '96vh', display: 'flex', alignItems: 'center', position: 'relative', padding: '6rem 0', overflow: 'hidden', background: '#050a14' }}>
+        
+        {/* Full-bleed Hero Banner Background */}
+        <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+          <Image 
+            src="/images/hero-bg.png" 
+            alt="Hero Network Background" 
+            fill 
+            priority 
+            style={{ objectFit: 'cover', opacity: 0.5, filter: 'brightness(0.7)' }} 
+          />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, transparent, #050a14)' }}></div>
+        </div>
+
+        {/* Particle Background Layer on top */}
         <ParticleBackground />
 
         {/* Organic gradient orbs */}
-        <div style={{ position: 'absolute', top: '8%', left: '3%', width: '45%', height: '45%', background: 'radial-gradient(circle, rgba(59,130,246,0.06) 0%, transparent 70%)', zIndex: 0 }}></div>
-        <div style={{ position: 'absolute', bottom: '10%', right: '5%', width: '35%', height: '35%', background: 'radial-gradient(circle, rgba(34,197,94,0.04) 0%, transparent 70%)', zIndex: 0 }}></div>
+        <div style={{ position: 'absolute', top: '8%', left: '3%', width: '45%', height: '45%', background: 'radial-gradient(circle, rgba(59,130,246,0.1) 0%, transparent 70%)', zIndex: 1 }}></div>
+        <div style={{ position: 'absolute', bottom: '10%', right: '5%', width: '35%', height: '35%', background: 'radial-gradient(circle, rgba(34,197,94,0.08) 0%, transparent 70%)', zIndex: 1 }}></div>
 
-        <div className="container" id="inicio" style={{ position: 'relative', zIndex: 1 }}>
+        <div className="container" id="inicio" style={{ position: 'relative', zIndex: 10 }}>
           <ParallaxSection offset={80}>
+            
+            {/* Ultra-sharp Name Branding (from User's Banner) */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              style={{
+                marginBottom: '3rem',
+                borderLeft: '4px solid var(--accent-green)',
+                paddingLeft: '1.5rem',
+              }}
+            >
+              <h2 style={{ 
+                fontSize: 'clamp(1rem, 3vw, 1.5rem)', 
+                fontWeight: 800, 
+                letterSpacing: '0.6em', 
+                color: 'white', 
+                textTransform: 'uppercase',
+                margin: 0,
+                opacity: 0.9,
+                lineHeight: 1
+              }}>
+                Marcelo Rodriguez Canessa
+              </h2>
+              <p style={{ color: 'var(--accent-green)', fontSize: '0.8rem', fontWeight: 700, letterSpacing: '0.3em', marginTop: '0.5rem', textTransform: 'uppercase' }}>
+                Engineering & IT Consulting
+              </p>
+            </motion.div>
+
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -73,20 +116,21 @@ export default function Home() {
               style={{ 
                 display: 'inline-flex', 
                 padding: '0.5rem 1.2rem', 
-                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(34, 197, 94, 0.06))', 
+                background: 'linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(34, 197, 94, 0.1))', 
                 color: 'var(--accent-green)', 
-                borderRadius: '999px', 
+                borderRadius: '4px', 
                 marginBottom: '2rem', 
                 fontWeight: 700, 
                 fontSize: '0.8rem', 
-                border: '1px solid rgba(34, 197, 94, 0.15)', 
+                border: '1px solid rgba(34, 197, 94, 0.2)', 
                 textTransform: 'uppercase', 
-                letterSpacing: '0.1em',
+                letterSpacing: '0.15em',
                 gap: '0.6rem',
                 alignItems: 'center',
+                backdropFilter: 'blur(10px)',
               }}
             >
-              <ShieldCheck size={14} /> Ingeniería de Sistemas & Consultoría 
+              <ShieldCheck size={14} /> Systems Engineering 
               <span style={{ color: 'var(--accent-green)', fontSize: '0.9rem' }}>🌿</span>
             </motion.div>
             
@@ -98,13 +142,13 @@ export default function Home() {
             >
               <TypeAnimation
                 sequence={[
-                  'Arquitecturas Digitales',
+                  'Digital Architectures',
                   2000,
-                  'Infraestructuras Seguras',
+                  'Secure Infrastructures',
                   2000,
-                  'Soluciones Sostenibles',
+                  'Sustainable Solutions',
                   2000,
-                  'Tecnología que Trasciende',
+                  'Technology for Future',
                   2000,
                 ]}
                 wrapper="span"
@@ -113,7 +157,7 @@ export default function Home() {
                 style={{ display: 'inline' }}
               />
               <br className="hidden-mobile" />
-              <span className="text-gradient">Robustas y Seguras.</span>
+              <span className="text-gradient">Robust & Secure.</span>
             </motion.h1>
             
             <motion.p 
@@ -122,7 +166,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               style={{ fontSize: '1.25rem', marginBottom: '3rem', maxWidth: '700px', lineHeight: 1.6, color: 'rgba(255,255,255,0.7)' }}
             >
-              Ayudamos a empresas a trascender sus límites tecnológicos mediante la implementación de infraestructuras elásticas, ciberseguridad perimetral y gestión de nube inteligente — con un compromiso firme hacia la eficiencia energética.
+              Helping companies transcend their technological limits through mission-critical cloud scaling, perimeter cybersecurity, and energy-efficient digital ecosystems.
             </motion.p>
             
             <motion.div
@@ -132,13 +176,13 @@ export default function Home() {
               style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}
             >
               <a href="#contacto" className="btn btn-primary" style={{ padding: '1rem 2rem' }}>
-                Agendar Consultoría <ArrowRight size={20} style={{ marginLeft: '0.5rem' }} />
+                Schedule Consulting <ArrowRight size={20} style={{ marginLeft: '0.5rem' }} />
               </a>
               <a href="#proyectos" className="btn btn-outline" style={{ padding: '1rem 2rem' }}>
-                Casos de Éxito
+                Case Studies
               </a>
               <span className="badge-green" style={{ fontSize: '0.75rem' }}>
-                <Leaf size={13} /> Empresa Eco-Consciente
+                <Leaf size={13} /> Eco-Conscious Enterprise
               </span>
             </motion.div>
           </ParallaxSection>
@@ -164,8 +208,8 @@ export default function Home() {
       <section id="proyectos" style={{ padding: '8rem 0' }}>
         <div className="container">
           <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
-             <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} style={{ color: 'var(--accent-green)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '0.2em' }}>Portafolio Seleccionado</motion.span>
-             <h2 style={{ fontSize: '3rem', marginTop: '1rem' }}>Impacto en <span className="text-gradient">Negocios Reales</span></h2>
+             <motion.span initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} style={{ color: 'var(--accent-green)', fontWeight: 700, textTransform: 'uppercase', fontSize: '0.8rem', letterSpacing: '0.2em' }}>Selected Portfolio</motion.span>
+             <h2 style={{ fontSize: '3rem', marginTop: '1rem' }}>Real-World <span className="text-gradient">Business Impact.</span></h2>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem' }}>
@@ -216,17 +260,17 @@ export default function Home() {
         <div className="container">
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
             <div style={{ padding: '2rem' }}>
-               <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Nuestra <br/><span className="text-gradient">Experticia.</span></h2>
-               <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>No solo instalamos software; diseñamos ecosistemas que permiten a su empresa operar sin miedos ni límites geográficos — con la mínima huella digital posible.</p>
+               <h2 style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>Core <br/><span className="text-gradient">Expertise.</span></h2>
+               <p style={{ color: 'var(--text-muted)', marginBottom: '2rem' }}>We don't just deploy software; we engineer ecosystems that allow your business to scale globally without borders or security fears.</p>
                <div style={{ width: '40px', height: '4px', background: 'linear-gradient(90deg, var(--accent), var(--accent-green))', borderRadius: '2px' }}></div>
             </div>
             
-            <GridService icon={<Cloud />} title="Cloud Transformation" desc="Migración y optimización en AWS, Azure y Google Cloud para escalabilidad infinita." />
-            <GridService icon={<ShieldCheck />} title="Cyber Security" desc="Seguridad perimetral, auditorías de vulnerabilidad y respuesta ante incidentes crítica." />
-            <GridService icon={<Database />} title="Data Management" desc="Estructuración de datos masivos y optimización de consultas para inteligencia de negocio." />
-            <GridService icon={<Server />} title="IT Infrastructure" desc="Diseño y administración de servidores locales y virtuales bajo estándares Enterprise." />
-            <GridService icon={<Lock />} title="Network Privacy" desc="Implementación de VPNs corporativas y túneles seguros para el trabajo remoto global." />
-            <GridService icon={<Leaf />} title="Green IT Optimization" desc="Reducción de consumo energético, optimización de recursos cloud y arquitecturas eco-eficientes." isGreen />
+            <GridService icon={<Cloud />} title="Cloud Transformation" desc="Seamless migration and optimization across AWS and Azure for elastic scalability." />
+            <GridService icon={<ShieldCheck />} title="Cyber Security" desc="Perimeter defense, vulnerability audits, and critical incident response protocols." />
+            <GridService icon={<Database />} title="Data Management" desc="Massive data structuring and query optimization for actionable business intelligence." />
+            <GridService icon={<Server />} title="IT Infrastructure" desc="Enterprise-grade server design and administration for local and virtualized environments." />
+            <GridService icon={<Lock />} title="Network Privacy" desc="Global VPN implementation and secure tunneling for high-performance remote operations." />
+            <GridService icon={<Leaf />} title="Green IT Optimization" desc="Energy consumption reduction and eco-efficient resource management." isGreen />
           </div>
         </div>
       </section>
@@ -234,7 +278,7 @@ export default function Home() {
       {/* ==================== TESTIMONIOS CAROUSEL ==================== */}
       <TestimonialCarousel />
 
-      {/* ==================== ENFOQUE / ABOUT ==================== */}
+      {/* ==================== ABOUT SECTION ==================== */}
       <section style={{ padding: '8rem 0' }}>
          <div className="container">
             <motion.div 
@@ -254,13 +298,13 @@ export default function Home() {
               }}
             >
                <div style={{ flex: '1 1 300px' }}>
-                  <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.2em' }}>FILOSOFÍA DE TRABAJO</span>
-                  <h2 style={{ fontSize: '2.5rem', marginTop: '1rem', marginBottom: '2rem' }}>Tecnología Humana para <span className="text-gradient">Negocios de Alta Velocidad.</span></h2>
+                  <span style={{ color: 'var(--accent-green)', fontWeight: 700, fontSize: '0.8rem', letterSpacing: '0.2em' }}>LEADERSHIP PHILOSOPHY</span>
+                  <h2 style={{ fontSize: '2.5rem', marginTop: '1rem', marginBottom: '2rem' }}>Human Technology for <span className="text-gradient">High-Velocity Business.</span></h2>
                   <p style={{ lineHeight: 1.8, fontSize: '1.1rem', color: 'var(--text-muted)' }}>
-                    Mi nombre es <strong>Marcelo</strong>, y mi misión es eliminar la fricción tecnológica de su camino. Creo en la simplicidad como la máxima sofisticación; por eso mis soluciones buscan ser potentes por dentro pero manejables y amigables por fuera.
+                    I am <strong>Marcelo</strong>, and my mission is to remove technological friction from your path. I believe in simplicity as the ultimate sophistication—engineering solutions that are powerful internally but intuitive externally.
                   </p>
                   <p style={{ lineHeight: 1.8, fontSize: '1rem', color: 'var(--text-muted)', marginTop: '1rem' }}>
-                    🌿 Trabajamos bajo principios de <strong style={{ color: 'var(--accent-green)' }}>sostenibilidad tecnológica</strong>: infraestructuras eficientes que reducen consumo energético sin comprometer rendimiento.
+                    🌿 Operating under <strong style={{ color: 'var(--accent-green)' }}>Sustainability Principles</strong>: delivering high-performance architectures while optimizing for the lowest possible digital footprint.
                   </p>
                </div>
                <div style={{ flex: '1 1 200px', textAlign: 'center' }}>
@@ -280,17 +324,17 @@ export default function Home() {
                     animation: 'floatSlow 6s ease-in-out infinite',
                   }}>MC</div>
                   <h4 style={{ marginBottom: '0.2rem' }}>Marcelo R. Canessa</h4>
-                  <p style={{ color: 'var(--accent-green)', fontWeight: 600, fontSize: '0.9rem' }}>Ingeniero Jefe de Consultoría</p>
+                  <p style={{ color: 'var(--accent-green)', fontWeight: 600, fontSize: '0.9rem' }}>Chief Engineering Consultant</p>
                   <div style={{ display: 'flex', justifyContent: 'center', gap: '0.5rem', marginTop: '1rem' }}>
                     <span className="badge-green"><Leaf size={12} /> Eco-IT</span>
-                    <span className="badge-green"><Zap size={12} /> Eficiencia</span>
+                    <span className="badge-green"><Zap size={12} /> Efficiency</span>
                   </div>
                </div>
             </motion.div>
          </div>
       </section>
 
-      {/* ==================== CONTACTO & PAGOS ==================== */}
+      {/* ==================== CONTACT FORM ==================== */}
       <section id="contacto" style={{ padding: '8rem 0' }}>
         <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '4rem' }}>
           
@@ -313,85 +357,55 @@ export default function Home() {
               borderRadius: '0',
             }}
           >
-            <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Escríbame.</h2>
-            <p style={{ fontSize: '1rem', marginBottom: '2rem', color: 'var(--text-muted)' }}>Analizaré su caso personalmente para proponerle la arquitectura más adecuada.</p>
+            <h2 style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Start a Case.</h2>
+            <p style={{ fontSize: '1rem', marginBottom: '2rem', color: 'var(--text-muted)' }}>I personally analyze every inquiry to propose the most robust architecture for your needs.</p>
             
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>EMPRESA / NOMBRE</label>
-                <input required type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Ej. Corporación Acme" />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>ENTITY / NAME</label>
+                <input required type="text" className="input-field" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="Acme Corp" />
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>CORREO CORPORATIVO</label>
-                <input required type="email" className="input-field" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="nombre@empresa.com" />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>CORPORATE EMAIL</label>
+                <input required type="email" className="input-field" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} placeholder="name@company.com" />
               </div>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>TIPO DE CLIENTE</label>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>INDUSTRY</label>
                 <select required className="input-field" value={formData.industry} onChange={e => setFormData({...formData, industry: e.target.value})}>
-                  <option value="">Seleccione industria...</option>
-                  <option value="Supermercado / Retail">Supermercado / Retail</option>
-                  <option value="Botillería / Distribución">Botillería / Distribución</option>
-                  <option value="Corporativo / Servicios">Corporativo / Servicios</option>
-                  <option value="Logística / Transporte">Logística / Transporte</option>
-                  <option value="Otro">Otro sector</option>
+                  <option value="">Select Sector...</option>
+                  <option value="Retail / Distribution">Retail / Distribution</option>
+                  <option value="Finance / Fintech">Finance / Fintech</option>
+                  <option value="Logistics / Supply Chain">Logistics / Supply Chain</option>
+                  <option value="Tech / SaaS">Tech / SaaS</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
               <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>ESCALA (EQUIPOS/USUARIOS)</label>
-                <input required type="text" className="input-field" value={formData.scale} onChange={e => setFormData({...formData, scale: e.target.value})} placeholder="Ej. 15 puestos, 2 sedes" />
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>SCALE (USERS/NODES)</label>
+                <input required type="text" className="input-field" value={formData.scale} onChange={e => setFormData({...formData, scale: e.target.value})} placeholder="e.g. 50 nodes, 2 sites" />
               </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>PLAZO ESTIMADO DE REALIZACIÓN</label>
-                <select required className="input-field" value={formData.timeline} onChange={e => setFormData({...formData, timeline: e.target.value})}>
-                  <option value="">¿Cuándo desea iniciar?</option>
-                  <option value="Urgente (Lo antes posible)">Urgente (Lo antes posible)</option>
-                  <option value="Corto Plazo (1 mes)">Corto Plazo (1 mes)</option>
-                  <option value="Mediano Plazo (3-6 meses)">Mediano Plazo (3-6 meses)</option>
-                  <option value="Solo Cotización">Solo Cotización / Planeación</option>
-                </select>
-              </div>
-            </div>
-
-            <div>
-              <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>MENSAJE / REQUERIMIENTO PRINCIPAL</label>
-              <textarea required className="input-field" rows={4} value={formData.message} onChange={e => setFormData({...formData, message: e.target.value})} placeholder="Describa brevemente el reto técnico..." />
-            </div>
-
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>PROCEDIMIENTOS A USAR</label>
-                <textarea className="input-field" rows={3} value={formData.procedures} onChange={e => setFormData({...formData, procedures: e.target.value})} placeholder="Ej. VPN, Migración, Cifrado..." />
-              </div>
-              <div>
-                <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.8rem', fontWeight: 700, color: 'var(--accent-green)' }}>NOTAS ADICIONALES</label>
-                <textarea className="input-field" rows={3} value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} placeholder="Cualquier otro detalle para desplayarse..." />
-              </div>
-            </div>
-            
             <button 
               type="submit" 
               className="btn btn-primary" 
               disabled={status === 'loading'}
               style={{ marginTop: '1rem', padding: '1.2rem', fontWeight: 700, fontSize: '1rem' }}
             >
-              {status === 'loading' ? 'Procesando...' : '🌿 Enviar Propuesta Estratégica'}
+              {status === 'loading' ? 'Processing...' : '🌿 Send Strategic Proposal'}
             </button>
-            {status === 'success' && <p style={{ color: '#4ade80', textAlign: 'center', marginTop: '1rem', fontWeight: 600 }}>¡Mensaje enviado con éxito!</p>}
-            {status === 'error' && <p style={{ color: '#f87171', textAlign: 'center', marginTop: '1rem', fontWeight: 600 }}>Error al enviar. Intente con Gmail PASS.</p>}
+            {status === 'success' && <p style={{ color: '#4ade80', textAlign: 'center', marginTop: '1rem', fontWeight: 600 }}>Inquiry sent successfully.</p>}
           </motion.form>
 
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-              <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Gestión de <span className="text-gradient">Pagos</span></h3>
-              <p style={{ marginBottom: '3rem', fontSize: '1.1rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>Optimice su flujo administrativo permitiendo pagos digitales instantáneos para auditorías rápidas o mantenimientos preventivos.</p>
+              <h3 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Management <span className="text-gradient">& Payments</span></h3>
+              <p style={{ marginBottom: '3rem', fontSize: '1.1rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>Optimized administrative flows through secure digital payments for auditing and maintenance retainer services.</p>
               
-              <PaymentQR amount={500.00} concept="Consultoría Arquitectura Cloud (Abono)" />
+              <PaymentQR amount={500.00} concept="Architecture Consulting (Deposit)" />
             </motion.div>
           </div>
 
@@ -417,21 +431,21 @@ function GridService({ icon, title, desc, isGreen }: { icon: React.ReactNode, ti
     >
       <div style={{ color: isGreen ? 'var(--accent-green)' : 'var(--accent)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
          <div style={{ 
-           color: isGreen ? 'var(--accent-green)' : 'var(--accent)',
-           width: '40px',
-           height: '40px',
-           borderRadius: '10px',
-           background: isGreen ? 'rgba(34,197,94,0.1)' : 'rgba(59,130,246,0.1)',
-           display: 'flex',
-           alignItems: 'center',
-           justifyContent: 'center',
+            color: isGreen ? 'var(--accent-green)' : 'var(--accent)',
+            width: '40px',
+            height: '40px',
+            borderRadius: '10px',
+            background: isGreen ? 'rgba(34,197,94,0.1)' : 'rgba(59,130,246,0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
          }}>{icon}</div>
          <h4 style={{ color: 'white', margin: 0, fontSize: '1.15rem' }}>{title}</h4>
       </div>
       <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.6 }}>{desc}</p>
       {isGreen && (
         <span className="badge-green" style={{ marginTop: '1rem', display: 'inline-flex' }}>
-          🌱 Sostenible
+          🌱 Sustainable
         </span>
       )}
     </motion.div>

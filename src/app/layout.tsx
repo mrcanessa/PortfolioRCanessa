@@ -14,6 +14,10 @@ export const metadata: Metadata = {
   title: 'Consultoría e Ingeniería IT | Marcelo Canessa',
   description: 'Portafolio profesional de soluciones de ingeniería informática y consultoría IT. Arquitecturas digitales robustas, seguras y sostenibles.',
   keywords: 'consultoría, informática, TI, gestión, software, sistemas, cloud, ciberseguridad, sostenibilidad, tecnología verde',
+  icons: {
+    icon: '/favicon.png',
+    apple: '/favicon.png',
+  },
 };
 
 export default function RootLayout({
@@ -33,7 +37,7 @@ export default function RootLayout({
           position: 'fixed', 
           top: 0, 
           width: '100%', 
-          zIndex: 50, 
+          zIndex: 100, // Increased z-index
           background: 'rgba(10, 15, 30, 0.85)', 
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
@@ -69,7 +73,7 @@ export default function RootLayout({
           </div>
         </nav>
 
-        <main style={{ paddingTop: '80px' }}>{children}</main>
+        <main>{children}</main>
 
         {/* Premium Footer */}
         <footer style={{ borderTop: '1px solid var(--card-border)', padding: '6rem 0 3rem', background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(10,15,30,0.9) 100%)' }}>
@@ -106,7 +110,7 @@ export default function RootLayout({
             </div>
 
             {/* Footer Grid */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '4rem', textAlign: 'left', marginBottom: '4rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '4rem', textAlign: 'left', marginBottom: '4rem', marginTop: '4rem' }}>
               <div>
                 <div style={{ fontWeight: '900', fontSize: '1.2rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                    <div style={{ 
