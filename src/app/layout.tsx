@@ -44,7 +44,7 @@ export default function RootLayout({
           borderBottom: '1px solid rgba(255,255,255,0.04)' 
         }}>
           <div className="container nav-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div style={{ fontWeight: '900', fontSize: '1.5rem', letterSpacing: '-0.04em', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+            <a href="/" style={{ fontWeight: '900', fontSize: '1.5rem', letterSpacing: '-0.04em', display: 'flex', alignItems: 'center', gap: '0.6rem', textDecoration: 'none' }}>
               <div style={{ 
                 width: '36px', 
                 height: '36px', 
@@ -60,20 +60,20 @@ export default function RootLayout({
               <div>
                 <span style={{ color: '#fff' }}>Marcelo</span><span style={{ color: 'var(--accent-green)' }}>Canessa</span>
               </div>
-            </div>
+            </a>
             <ul className="nav-menu hidden-mobile" style={{ display: 'flex', gap: '2.5rem', listStyle: 'none', fontWeight: 600, fontSize: '0.9rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              <li><a href="#proyectos" className="nav-link">Casos</a></li>
-              <li><a href="#servicios" className="nav-link">Experticia</a></li>
-              <li><a href="#testimonios" className="nav-link">Testimonios</a></li>
-              <li><a href="#contacto" className="nav-link">Contacto</a></li>
+              <li><a href="/#proyectos" className="nav-link">Casos</a></li>
+              <li><a href="/#servicios" className="nav-link">Experticia</a></li>
+              <li><a href="/#testimonios" className="nav-link">Testimonios</a></li>
+              <li><a href="/#contacto" className="nav-link">Contacto</a></li>
             </ul>
-            <a href="#contacto" className="btn btn-primary" style={{ padding: '0.6rem 1.4rem', fontSize: '0.8rem' }}>
+            <a href="/#contacto" className="btn btn-primary" style={{ padding: '0.6rem 1.4rem', fontSize: '0.8rem' }}>
               Agendar
             </a>
           </div>
         </nav>
 
-        <main>{children}</main>
+        <main style={{ paddingTop: '80px' }}>{children}</main>
 
         {/* Premium Footer */}
         <footer style={{ borderTop: '1px solid var(--card-border)', padding: '6rem 0 3rem', background: 'linear-gradient(180deg, rgba(0,0,0,0.2) 0%, rgba(10,15,30,0.9) 100%)' }}>

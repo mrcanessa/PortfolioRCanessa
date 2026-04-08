@@ -175,10 +175,10 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.4 }}
               style={{ display: 'flex', gap: '1.5rem', flexWrap: 'wrap', alignItems: 'center' }}
             >
-              <a href="#contacto" className="btn btn-primary" style={{ padding: '1rem 2rem' }}>
+              <a href="/#contacto" className="btn btn-primary" style={{ padding: '1rem 2rem' }}>
                 Schedule Consulting <ArrowRight size={20} style={{ marginLeft: '0.5rem' }} />
               </a>
-              <a href="#proyectos" className="btn btn-outline" style={{ padding: '1rem 2rem' }}>
+              <a href="/#proyectos" className="btn btn-outline" style={{ padding: '1rem 2rem' }}>
                 Case Studies
               </a>
               <span className="badge-green" style={{ fontSize: '0.75rem' }}>
