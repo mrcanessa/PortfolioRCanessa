@@ -105,37 +105,118 @@ export async function POST(request: Request) {
       `,
     });
 
-    // 2. Respuesta automática para el Cliente
+    // 2. Respuesta automática para el Cliente (Estilo ISO / Orden de Requerimiento)
+    const orderId = `OR-${new Date().getFullYear()}-${Math.floor(Math.random() * 10000).toString().padStart(4, '0')}`;
+    const currentDate = new Date().toLocaleDateString('es-CL');
+
     await transporter.sendMail({
       from: `"Consultoria e Ingenieria IT" <${user}>`,
       to: email,
-      subject: `Confirmación de Requerimiento para ${industry} - Consultoria e Ingenieria IT`,
+      subject: `[CONFIRMACIÓN] Orden de Requerimiento ${orderId} - ${industry}`,
       html: `
-        <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: 0 auto; color: #334155; line-height: 1.6;">
-          <div style="background: #0f172a; padding: 30px; border-radius: 10px; text-align: center;">
-            <h1 style="color: #3b82f6; margin: 0; font-size: 24px;">¡Propuesta Estratégica en Marcha!</h1>
-          </div>
+        <div style="font-family: 'Courier New', Courier, monospace; max-width: 800px; margin: 20px auto; border: 2px solid #334155; color: #1e293b; background: #ffffff;">
           
-          <div style="padding: 30px;">
-            <p>Hola <strong>${name}</strong>,</p>
-            <p>He recibido los detalles técnicos para tu proyecto en el sector de <strong>${industry}</strong>. Contar con la escala de <strong>${scale}</strong> y el plazo de <strong>${timeline}</strong> me permite realizar un análisis mucho más preciso.</p>
-            
-            <div style="background: #f8fafc; border-left: 4px solid #3b82f6; padding: 20px; margin: 25px 0;">
-              <p style="margin: 0; font-size: 14px; color: #64748b;">Analizaré los procedimientos sugeridos: <em>"${procedures || 'Evaluación estándar'}"</em> y me pondré en contacto contigo hoy mismo.</p>
-            </div>
+          <!-- Encabezado de Documento -->
+          <table style="width: 100%; border-bottom: 2px solid #334155; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 15px; width: 40%; border-right: 2px solid #334155; text-align: center;">
+                <h2 style="margin: 0; color: #1e40af; font-size: 18px; letter-spacing: 2px;">CONSULTORÍA E INGENIERÍA IT</h2>
+                <small style="font-size: 10px; color: #64748b;">SOLUCIONES DE ALTA DISPONIBILIDAD</small>
+              </td>
+              <td style="padding: 15px; text-align: center; background: #f8fafc;">
+                <h1 style="margin: 0; font-size: 20px; text-transform: uppercase;">Orden de Requerimiento</h1>
+                <p style="margin: 5px 0 0; font-size: 12px; font-weight: bold; color: #3b82f6;">DOC # ${orderId}</p>
+              </td>
+              <td style="padding: 15px; width: 25%; border-left: 2px solid #334155; font-size: 11px;">
+                <strong>Fecha:</strong> ${currentDate}<br/>
+                <strong>Versión:</strong> 1.0<br/>
+                <strong>Estado:</strong> EN ANÁLISIS
+              </td>
+            </tr>
+          </table>
 
-            <p style="background: #fefce8; border: 1px solid #fef08a; padding: 15px; border-radius: 8px; color: #854d0e; font-size: 0.9em; text-align: center;">
-              💡 <strong>Dato:</strong> Si necesitas enviarme esquemas de red o diagramas, puedes responder a mi correo de contacto directo una vez que te escriba.
-            </p>
-
-            <p style="margin-top: 30px; font-weight: bold; color: #1e293b;">¿Necesitas añadir detalles técnicos?</p>
-            <p style="font-size: 0.9em;">No respondas aquí. Por favor, <strong>vuelve a nuestro sitio web</strong> y rellena el formulario nuevamente. Mi sistema unirá la nueva información a tu ficha técnica actual.</p>
-            
-            <br />
-            <p style="margin-bottom: 0;">Un saludo cordial,</p>
-            <p style="margin-top: 5px;"><strong>Marcelo Rodriguez Canessa</strong><br />
-            <span style="color: #64748b; font-size: 0.9em;">Consultoría e Ingeniería IT</span></p>
+          <!-- Datos del Solicitante / Proyecto -->
+          <div style="padding: 20px; background: #f1f5f9; border-bottom: 2px solid #334155;">
+            <table style="width: 100%; font-size: 13px;">
+              <tr>
+                <td style="width: 50%;"><strong>EMPRESA / SOLICITANTE:</strong> ${name}</td>
+                <td><strong>RUBRO INDUSTRIAL:</strong> ${industry}</td>
+              </tr>
+              <tr>
+                <td style="padding-top: 5px;"><strong>CONTACTO:</strong> ${email}</td>
+                <td style="padding-top: 5px;"><strong>CÓDIGO CLIENTE:</strong> 13D-CONS-VIP</td>
+              </tr>
+            </table>
           </div>
+
+          <!-- Grilla Técnica Central -->
+          <table style="width: 100%; border-collapse: collapse; min-height: 250px;">
+            <tr>
+              <!-- Columna Requerimientos -->
+              <td style="padding: 20px; width: 60%; border-right: 2px solid #334155; vertical-align: top;">
+                <h4 style="margin: 0 0 10px; font-size: 12px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; text-transform: uppercase;">I. Especificaciones Técnicas</h4>
+                <p style="font-size: 14px; line-height: 1.6; white-space: pre-wrap;"><strong>Descripción General:</strong><br/>${message}</p>
+                
+                <h4 style="margin: 20px 0 10px; font-size: 12px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; text-transform: uppercase;">II. Procedimientos Sugeridos</h4>
+                <p style="font-size: 13px; color: #475569;">${procedures || 'Sujeto a evaluación técnica inicial'}</p>
+              </td>
+
+              <!-- Columna Tiempos / Escala -->
+              <td style="padding: 20px; width: 40%; vertical-align: top; background: #fcfcfc;">
+                <h4 style="margin: 0 0 10px; font-size: 12px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; text-transform: uppercase;">III. Factores de Entrega</h4>
+                
+                <div style="margin-bottom: 20px;">
+                  <strong style="font-size: 11px;">PLAZO ESTIMADO:</strong><br/>
+                  <span style="font-size: 16px; color: #1e40af; font-weight: bold;">${timeline}</span>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                  <strong style="font-size: 11px;">ESCALA DE INFRAESTRUCTURA:</strong><br/>
+                  <span style="font-size: 14px;">${scale}</span>
+                </div>
+
+                <div style="padding: 10px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 4px; font-size: 11px; margin-top: 30px;">
+                  <strong>NOTA IMPORTANTE:</strong><br/>
+                  Este requerimiento será analizado hoy mismo. Favor no responder aquí. Use el portal web para actualizaciones.
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Observaciones Adicionales -->
+          <div style="padding: 15px; border-top: 2px solid #334155; background: #fafafa;">
+             <small style="display: block; margin-bottom: 5px; font-weight: bold; font-size: 10px;">OBSERVACIONES / NOTAS DEL CLIENTE:</small>
+             <p style="margin: 0; font-size: 12px; font-style: italic; color: #64748b;">${notes || 'Sin observaciones registradas por el solicitante en el formulario inicial.'}</p>
+          </div>
+
+          <!-- Pie de Documento / Firmas -->
+          <table style="width: 100%; border-top: 2px solid #334155; border-collapse: collapse; text-align: center; font-size: 10px;">
+            <tr>
+              <td style="padding: 30px 15px 15px; width: 33.3%; border-right: 2px solid #334155;">
+                <div style="margin-bottom: 15px; height: 1px; background: #cbd5e1;"></div>
+                <strong>ELABORADO POR</strong><br/>
+                SISTEMA AUTOMATIZADO V.1
+              </td>
+              <td style="padding: 30px 15px 15px; width: 33.3%; border-right: 2px solid #334155;">
+                <div style="margin-bottom: 15px; height: 1px; background: #cbd5e1;"></div>
+                <strong>REVISADO POR</strong><br/>
+                INGENIERÍA PRE-VENTA
+              </td>
+              <td style="padding: 15px; width: 33.3%; background: #f8fafc;">
+                <div style="display: inline-block; padding: 5px 10px; border: 3px double #3b82f6; color: #3b82f6; transform: rotate(-5deg); font-weight: 800; font-size: 14px;">
+                   VALIDADO
+                </div>
+                <br/><br/>
+                <strong>APROBADO POR</strong><br/>
+                M. RODRÍGUEZ CANESSA
+              </td>
+            </tr>
+          </table>
+
+          <div style="background: #334155; color: #ffffff; padding: 10px; text-align: center; font-size: 9px; letter-spacing: 1px;">
+             © ${new Date().getFullYear()} CONSULTORÍA E INGENIERÍA IT - CONFIDENCIAL - DOCUMENTO DIGITAL VÁLIDO SIN FIRMA FÍSICA
+          </div>
+
         </div>
       `,
     });
